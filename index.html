@@ -400,6 +400,103 @@
       animation: pulse 0.5s ease;
     }
 
+    .summary-level-down {
+      text-align: center;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--danger);
+      padding: 8px 0;
+      animation: shake 0.5s ease;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-6px); }
+      40% { transform: translateX(6px); }
+      60% { transform: translateX(-4px); }
+      80% { transform: translateX(4px); }
+    }
+
+    /* ========== POPUP CAMBIO DE NIVEL ========== */
+    .level-popup-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+      animation: fadeIn 0.2s ease;
+      padding: 24px;
+    }
+
+    .level-popup {
+      background: var(--surface);
+      border-radius: var(--radius-xl);
+      padding: 32px 28px;
+      text-align: center;
+      max-width: 320px;
+      width: 100%;
+      animation: levelPopIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .level-popup.up {
+      border: 2px solid #F59E0B;
+      box-shadow: 0 0 40px rgba(245, 158, 11, 0.3);
+    }
+
+    .level-popup.down {
+      border: 2px solid var(--danger);
+      box-shadow: 0 0 40px rgba(239, 68, 68, 0.2);
+    }
+
+    .level-popup-emoji {
+      font-size: 64px;
+      line-height: 1;
+      margin-bottom: 12px;
+    }
+
+    .level-popup-title {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .level-popup.up .level-popup-title { color: #F59E0B; }
+    .level-popup.down .level-popup-title { color: var(--danger); }
+
+    .level-popup-level {
+      font-size: 26px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .level-popup-msg {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.4;
+    }
+
+    .level-popup-dismiss {
+      margin-top: 20px;
+      background: var(--surface-hover);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: var(--radius-md);
+      padding: 10px 24px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    @keyframes levelPopIn {
+      0% { opacity: 0; transform: scale(0.5); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
     /* ========== LA TARJETA (FLASHCARD) ========== */
     .card-area {
       flex: 1;
@@ -1358,12 +1455,19 @@
     }
 
     function calcXP(isCorrect, streak, difficulty) {
-      if (!isCorrect) return 0;
-      let base = 10 * difficulty; // 10, 20, 30 según dificultad
-      if (streak >= 10) base += 15;       // bonus racha larga
-      else if (streak >= 5) base += 10;   // bonus racha media
-      else if (streak >= 3) base += 5;    // bonus racha corta
-      return base;
+      if (isCorrect) {
+        let base = 10 * difficulty;
+        if (streak >= 10) base += 15;
+        else if (streak >= 5) base += 10;
+        else if (streak >= 3) base += 5;
+        return base;
+      } else {
+        // Penalización por fallo (menos que lo que ganas, para que haya progreso neto)
+        let penalty = -3 * difficulty;
+        if (streak >= 5) penalty = -8 * difficulty;
+        else if (streak >= 3) penalty = -5 * difficulty;
+        return penalty;
+      }
     }
 
     // ===================================================================
@@ -1380,7 +1484,7 @@
       lastCardId: null,
       isFlipped: false,
       cardAnimating: false,
-      sessionStats: { total: 0, correct: 0, incorrect: 0, streak: 0, bestStreak: 0, maxStreak: 0, wrongCards: [], xpGained: 0, leveledUp: false, wrongStreak: 0 },
+      sessionStats: { total: 0, correct: 0, incorrect: 0, streak: 0, bestStreak: 0, wrongCards: [], xpGained: 0, wrongStreak: 0, startLevelName: null },
       showResetConfirm: false,
       failsOnly: false,
       failsPool: []
@@ -1437,7 +1541,7 @@
         cardAnimating: true,
         failsOnly,
         failsPool: failsOnly ? pool : [],
-        sessionStats: { total: 0, correct: 0, incorrect: 0, streak: 0, bestStreak: 0, wrongStreak: 0, wrongCards: [], xpGained: 0, leveledUp: false }
+        sessionStats: { total: 0, correct: 0, incorrect: 0, streak: 0, bestStreak: 0, wrongStreak: 0, wrongCards: [], xpGained: 0, startLevelName: getLevel(state.xp).name }
       });
       setTimeout(() => setState({ cardAnimating: false }), 350);
     }
@@ -1450,9 +1554,48 @@
     function showXPPopup(xpGained, isCorrect) {
       const popup = document.createElement('div');
       popup.className = `xp-popup ${isCorrect ? 'correct' : 'incorrect'}`;
-      popup.textContent = isCorrect ? `+${xpGained} XP` : '✗';
+      popup.textContent = isCorrect ? `+${xpGained} XP` : `${xpGained} XP`;
       document.body.appendChild(popup);
       setTimeout(() => popup.remove(), 800);
+    }
+
+    const LEVEL_UP_MESSAGES = [
+      '¡Imparable! Sigue así 💪',
+      '¡Tu vocabulario crece sin parar!',
+      '¡Cervantes estaría orgulloso!',
+      '¡La oposición es tuya!',
+      '¡Menudo nivel estás cogiendo!',
+    ];
+    const LEVEL_DOWN_MESSAGES = [
+      '¡No pasa nada! Todos tenemos días malos 😅',
+      '¡Ánimo! Un tropezón no es caída 🤷',
+      'Roma no se construyó en un día... 🏗️',
+      '¡Vamos, que tú puedes! A por ello 💪',
+      'Caer está permitido, levantarse es obligatorio 😤',
+    ];
+
+    function showLevelPopup(direction, level) {
+      const messages = direction === 'up' ? LEVEL_UP_MESSAGES : LEVEL_DOWN_MESSAGES;
+      const msg = messages[Math.floor(Math.random() * messages.length)];
+      const title = direction === 'up' ? '¡Subida de nivel!' : '¡Has bajado de nivel!';
+
+      const overlay = document.createElement('div');
+      overlay.className = 'level-popup-overlay';
+      overlay.innerHTML = `
+        <div class="level-popup ${direction}">
+          <div class="level-popup-emoji">${level.emoji}</div>
+          <div class="level-popup-title">${title}</div>
+          <div class="level-popup-level">${level.name}</div>
+          <div class="level-popup-msg">${msg}</div>
+          <button class="level-popup-dismiss">Continuar</button>
+        </div>
+      `;
+      document.body.appendChild(overlay);
+
+      const dismiss = () => { if (overlay.parentNode) overlay.remove(); };
+      overlay.querySelector('.level-popup-dismiss').addEventListener('click', dismiss);
+      overlay.addEventListener('click', (e) => { if (e.target === overlay) dismiss(); });
+      setTimeout(dismiss, 3000);
     }
 
     function answerCorrect() {
@@ -1466,6 +1609,10 @@
       const newLevel = getLevel(newXP);
       saveXP(newXP);
       showXPPopup(xpEarned, true);
+      // Popup de subida de nivel en tiempo real
+      if (newLevel.name !== prevLevel.name) {
+        setTimeout(() => showLevelPopup('up', newLevel), 300);
+      }
       const stats = {
         ...state.sessionStats,
         total: state.sessionStats.total + 1,
@@ -1473,8 +1620,7 @@
         streak: newStreak,
         bestStreak: Math.max(newStreak, state.sessionStats.bestStreak),
         wrongStreak: 0,
-        xpGained: state.sessionStats.xpGained + xpEarned,
-        leveledUp: state.sessionStats.leveledUp || (newLevel.name !== prevLevel.name)
+        xpGained: state.sessionStats.xpGained + xpEarned
       };
       nextCard(newProgress, stats, newXP);
     }
@@ -1483,17 +1629,27 @@
       if (!state.currentCard) return;
       const newProgress = handleIncorrect(state.currentCard.id, state.progress);
       saveProgress(newProgress);
-      showXPPopup(0, false);
       const newWrongStreak = state.sessionStats.wrongStreak + 1;
+      const xpLost = calcXP(false, newWrongStreak, state.currentCard.difficulty);
+      const prevLevel = getLevel(state.xp);
+      const newXP = Math.max(0, state.xp + xpLost);
+      const newLevel = getLevel(newXP);
+      saveXP(newXP);
+      showXPPopup(xpLost, false);
+      // Popup de bajada de nivel en tiempo real
+      if (newLevel.name !== prevLevel.name) {
+        setTimeout(() => showLevelPopup('down', newLevel), 300);
+      }
       const stats = {
         ...state.sessionStats,
         total: state.sessionStats.total + 1,
         incorrect: state.sessionStats.incorrect + 1,
         streak: 0,
         wrongStreak: newWrongStreak,
+        xpGained: state.sessionStats.xpGained + xpLost,
         wrongCards: [...state.sessionStats.wrongCards, state.currentCard]
       };
-      nextCard(newProgress, stats, state.xp);
+      nextCard(newProgress, stats, newXP);
     }
 
     function nextCard(newProgress, stats, newXP) {
@@ -1760,19 +1916,21 @@
         arr.findIndex(c => c.id === card.id) === idx
       );
 
-      const { xpGained, leveledUp } = state.sessionStats;
+      const { xpGained, startLevelName } = state.sessionStats;
       const level = getLevel(state.xp);
       const next = getNextLevel(state.xp);
       const xpInLevel = state.xp - level.xp;
       const xpNeeded = next ? next.xp - level.xp : 1;
       const pct = next ? Math.min(100, Math.round((xpInLevel / xpNeeded) * 100)) : 100;
+      const levelChanged = startLevelName && startLevelName !== level.name;
+      const wentUp = levelChanged && level.xp > (LEVELS.find(l => l.name === startLevelName)?.xp || 0);
 
       app.innerHTML = `
         <div class="summary-screen">
           <div class="summary-title">Sesión completada</div>
 
-          ${xpGained > 0 ? `<div class="summary-xp-gained">+${xpGained} XP</div>` : ''}
-          ${leveledUp ? `<div class="summary-level-up">🎉 ¡Subiste a ${level.emoji} ${level.name}!</div>` : ''}
+          ${xpGained !== 0 ? `<div class="summary-xp-gained" style="color: ${xpGained > 0 ? 'var(--primary-light)' : 'var(--danger)'};">${xpGained > 0 ? '+' : ''}${xpGained} XP</div>` : ''}
+          ${levelChanged ? `<div class="${wentUp ? 'summary-level-up' : 'summary-level-down'}">${wentUp ? '🎉' : '😅'} ${wentUp ? '¡Subiste' : '¡Bajaste'} a ${level.emoji} ${level.name}!</div>` : ''}
 
           <div class="level-section">
             <div class="level-header">
