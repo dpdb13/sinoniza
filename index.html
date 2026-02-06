@@ -2219,7 +2219,7 @@
         </div>
       `;
 
-      document.getElementById('btn-again').addEventListener('click', startGame);
+      document.getElementById('btn-again').addEventListener('click', () => startGame(false));
       document.getElementById('btn-home').addEventListener('click', goHome);
 
       const wrongWordsBtn = document.getElementById('btn-wrong-words');
