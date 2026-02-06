@@ -382,30 +382,16 @@
     .card-word {
       font-weight: 700;
       text-align: center;
-      line-height: 1.15;
+      line-height: 1.2;
       width: 100%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      overflow-wrap: break-word;
+      hyphens: none;
     }
 
-    /* Palabras sueltas: nunca partir */
-    .card-word.single-word {
-      white-space: nowrap;
-    }
-
-    /* Frases (varias palabras): permitir salto entre palabras, centrado */
-    .card-word.multi-word {
-      word-break: normal;
-      overflow-wrap: normal;
-      display: block;
-      text-align: center;
-    }
-
-    .card-word.size-xl { font-size: min(38px, 9vw); }
-    .card-word.size-lg { font-size: min(30px, 7.5vw); }
-    .card-word.size-md { font-size: min(24px, 6vw); }
-    .card-word.size-sm { font-size: min(20px, 5vw); }
+    .card-word.size-xl { font-size: clamp(22px, 7vw, 36px); }
+    .card-word.size-lg { font-size: clamp(18px, 5.5vw, 28px); }
+    .card-word.size-md { font-size: clamp(16px, 4.5vw, 22px); }
+    .card-word.size-sm { font-size: clamp(14px, 4vw, 19px); }
 
     .card-back .card-word {
       color: var(--primary-light);
@@ -1247,17 +1233,13 @@
       return '⭐⭐⭐';
     }
 
-    // Auto-tamaño y detección de palabra suelta vs frase
+    // Auto-tamaño según longitud del texto
     function getWordClasses(text) {
       const len = text.length;
-      const isMulti = text.includes(' ');
-      const wordClass = isMulti ? 'multi-word' : 'single-word';
-      let sizeClass;
-      if (len <= 9) sizeClass = 'size-xl';
-      else if (len <= 14) sizeClass = 'size-lg';
-      else if (len <= 20) sizeClass = 'size-md';
-      else sizeClass = 'size-sm';
-      return `${wordClass} ${sizeClass}`;
+      if (len <= 8) return 'size-xl';
+      if (len <= 13) return 'size-lg';
+      if (len <= 19) return 'size-md';
+      return 'size-sm';
     }
 
     function toggleCategory(cat) {
