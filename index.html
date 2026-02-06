@@ -2049,7 +2049,7 @@
 
       const confirmResetBtn = document.getElementById('btn-confirm-reset');
       if (confirmResetBtn) {
-        confirmResetBtn.addEventListener('click', resetProgress);
+        confirmResetBtn.addEventListener('click', () => resetProgress());
       }
 
       const cancelResetBtn = document.getElementById('btn-cancel-reset');
@@ -2128,19 +2128,19 @@
       `;
 
       // Event listeners
-      document.getElementById('btn-end').addEventListener('click', endSession);
+      document.getElementById('btn-end').addEventListener('click', () => endSession());
 
       const theCard = document.getElementById('the-card');
-      theCard.addEventListener('click', flipCard);
+      theCard.addEventListener('click', () => flipCard());
 
       const flipBtn = document.getElementById('btn-flip');
-      if (flipBtn) flipBtn.addEventListener('click', flipCard);
+      if (flipBtn) flipBtn.addEventListener('click', () => flipCard());
 
       const rightBtn = document.getElementById('btn-right');
-      if (rightBtn) rightBtn.addEventListener('click', answerCorrect);
+      if (rightBtn) rightBtn.addEventListener('click', () => answerCorrect());
 
       const wrongBtn = document.getElementById('btn-wrong');
-      if (wrongBtn) wrongBtn.addEventListener('click', answerIncorrect);
+      if (wrongBtn) wrongBtn.addEventListener('click', () => answerIncorrect());
     }
 
     function renderSummary() {
@@ -2222,7 +2222,7 @@
       `;
 
       document.getElementById('btn-again').addEventListener('click', () => startGame(false));
-      document.getElementById('btn-home').addEventListener('click', goHome);
+      document.getElementById('btn-home').addEventListener('click', () => goHome());
 
       const wrongWordsBtn = document.getElementById('btn-wrong-words');
       if (wrongWordsBtn) {
