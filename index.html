@@ -364,6 +364,12 @@
       display: flex;
       flex-direction: column;
       gap: 8px;
+      cursor: pointer;
+      transition: border-color 0.15s ease;
+    }
+
+    .level-section:active {
+      border-color: var(--primary);
     }
 
     .level-header {
@@ -495,6 +501,123 @@
     @keyframes levelPopIn {
       0% { opacity: 0; transform: scale(0.5); }
       100% { opacity: 1; transform: scale(1); }
+    }
+
+    /* ========== MODAL INFO DE NIVELES ========== */
+    .levels-info-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+      animation: fadeIn 0.2s ease;
+      padding: 16px;
+    }
+
+    .levels-info {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: 24px 20px;
+      max-width: 360px;
+      width: 100%;
+      max-height: 85dvh;
+      overflow-y: auto;
+      animation: levelPopIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .levels-info-title {
+      font-size: 20px;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 6px;
+    }
+
+    .levels-info-subtitle {
+      font-size: 13px;
+      color: var(--text-secondary);
+      text-align: center;
+      margin-bottom: 16px;
+      line-height: 1.4;
+    }
+
+    .levels-info-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .levels-info-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: var(--radius-md);
+      background: var(--bg);
+      border: 1px solid transparent;
+    }
+
+    .levels-info-row.current {
+      border-color: var(--primary);
+      background: var(--primary-pale);
+    }
+
+    .levels-info-emoji {
+      font-size: 24px;
+      width: 32px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .levels-info-details {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .levels-info-level-name {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .levels-info-level-xp {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .levels-info-check {
+      color: var(--primary);
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    .levels-info-how {
+      margin-top: 16px;
+      padding: 12px;
+      border-radius: var(--radius-md);
+      background: var(--bg);
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    .levels-info-how strong {
+      color: var(--text);
+    }
+
+    .levels-info-close {
+      margin-top: 16px;
+      width: 100%;
+      background: var(--surface-hover);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
     }
 
     /* ========== LA TARJETA (FLASHCARD) ========== */
@@ -1598,6 +1721,46 @@
       setTimeout(dismiss, 3000);
     }
 
+    function showLevelsInfo() {
+      const currentLevel = getLevel(state.xp);
+      const nextLvl = getNextLevel(state.xp);
+      const overlay = document.createElement('div');
+      overlay.className = 'levels-info-overlay';
+      overlay.innerHTML = `
+        <div class="levels-info">
+          <div class="levels-info-title">Niveles</div>
+          <div class="levels-info-subtitle">Gana XP acertando. Pierdes XP al fallar.</div>
+          <div class="levels-info-list">
+            ${LEVELS.map((lvl, i) => {
+              const isCurrent = lvl.name === currentLevel.name;
+              const reached = state.xp >= lvl.xp;
+              const nextThreshold = LEVELS[i + 1] ? LEVELS[i + 1].xp : null;
+              const rangeText = nextThreshold ? `${lvl.xp} — ${nextThreshold - 1} XP` : `${lvl.xp}+ XP`;
+              return `<div class="levels-info-row ${isCurrent ? 'current' : ''}" style="${!reached ? 'opacity: 0.45;' : ''}">
+                <div class="levels-info-emoji">${lvl.emoji}</div>
+                <div class="levels-info-details">
+                  <div class="levels-info-level-name">${lvl.name}</div>
+                  <div class="levels-info-level-xp">${rangeText}</div>
+                </div>
+                ${isCurrent ? '<div class="levels-info-check">◀</div>' : ''}
+              </div>`;
+            }).join('')}
+          </div>
+          <div class="levels-info-how">
+            <strong>Acierto:</strong> +10 a +45 XP (según dificultad y racha)<br>
+            <strong>Fallo:</strong> -3 a -24 XP (según dificultad y racha de fallos)<br>
+            <strong>Bonus racha:</strong> 3+ seguidas = +5, 5+ = +10, 10+ = +15<br>
+            ${nextLvl ? `<br>Te faltan <strong>${nextLvl.xp - state.xp} XP</strong> para ${nextLvl.emoji} ${nextLvl.name}` : '<br>¡Has alcanzado el nivel máximo!'}
+          </div>
+          <button class="levels-info-close">Cerrar</button>
+        </div>
+      `;
+      document.body.appendChild(overlay);
+      const dismiss = () => { if (overlay.parentNode) overlay.remove(); };
+      overlay.querySelector('.levels-info-close').addEventListener('click', dismiss);
+      overlay.addEventListener('click', (e) => { if (e.target === overlay) dismiss(); });
+    }
+
     function answerCorrect() {
       if (!state.currentCard) return;
       const newProgress = handleCorrect(state.currentCard.id, state.progress);
@@ -1714,7 +1877,7 @@
             const xpNeeded = next ? next.xp - level.xp : 1;
             const pct = next ? Math.min(100, Math.round((xpInLevel / xpNeeded) * 100)) : 100;
             return stats.studied > 0 ? `
-              <div class="level-section">
+              <div class="level-section" onclick="showLevelsInfo()">
                 <div class="level-header">
                   <div class="level-name">${level.emoji} ${level.name}</div>
                   <div class="level-xp">${state.xp} XP</div>
@@ -1739,7 +1902,7 @@
                 </div>
               </div>
             ` : `
-              <div class="level-section">
+              <div class="level-section" onclick="showLevelsInfo()">
                 <div class="level-header">
                   <div class="level-name">${level.emoji} ${level.name}</div>
                   <div class="level-xp">0 XP</div>
@@ -1932,7 +2095,7 @@
           ${xpGained !== 0 ? `<div class="summary-xp-gained" style="color: ${xpGained > 0 ? 'var(--primary-light)' : 'var(--danger)'};">${xpGained > 0 ? '+' : ''}${xpGained} XP</div>` : ''}
           ${levelChanged ? `<div class="${wentUp ? 'summary-level-up' : 'summary-level-down'}">${wentUp ? '🎉' : '😅'} ${wentUp ? '¡Subiste' : '¡Bajaste'} a ${level.emoji} ${level.name}!</div>` : ''}
 
-          <div class="level-section">
+          <div class="level-section" onclick="showLevelsInfo()">
             <div class="level-header">
               <div class="level-name">${level.emoji} ${level.name}</div>
               <div class="level-xp">${state.xp} XP</div>
