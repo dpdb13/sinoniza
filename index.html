@@ -216,11 +216,12 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      min-height: 100dvh;
-      padding: 16px;
+      height: 100dvh;
+      padding: 12px 16px;
       width: 100%;
       max-width: 480px;
       animation: fadeIn 0.3s ease;
+      overflow: hidden;
     }
 
     /* Header del juego */
@@ -265,14 +266,15 @@
       align-items: center;
       justify-content: center;
       width: 100%;
-      gap: 24px;
-      padding: 16px 0;
+      gap: 20px;
+      padding: 8px 0;
+      min-height: 0;
     }
 
     .card-container {
       width: 100%;
       max-width: 360px;
-      aspect-ratio: 3 / 4;
+      height: clamp(280px, 55dvh, 480px);
       perspective: 1000px;
     }
 
@@ -299,9 +301,10 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 32px 24px;
+      padding: 48px 24px 40px;
       border: 1px solid var(--border);
       box-shadow: var(--shadow);
+      overflow: hidden;
     }
 
     .card-front {
@@ -317,8 +320,8 @@
 
     .card-category {
       position: absolute;
-      top: 20px;
-      left: 20px;
+      top: 16px;
+      left: 16px;
       font-size: 11px;
       font-weight: 600;
       text-transform: uppercase;
@@ -331,35 +334,43 @@
 
     .card-difficulty {
       position: absolute;
-      top: 20px;
-      right: 20px;
-      font-size: 18px;
+      top: 16px;
+      right: 16px;
+      font-size: 16px;
     }
 
     .card-word {
-      font-size: 36px;
       font-weight: 700;
       text-align: center;
-      line-height: 1.2;
+      line-height: 1.15;
       word-break: break-word;
+      max-width: 100%;
+      padding: 0 4px;
     }
+
+    .card-word.size-xl { font-size: 38px; }
+    .card-word.size-lg { font-size: 32px; }
+    .card-word.size-md { font-size: 26px; }
+    .card-word.size-sm { font-size: 22px; }
 
     .card-back .card-word {
       color: var(--primary-light);
     }
 
     .card-hint {
-      margin-top: 16px;
-      font-size: 15px;
+      margin-top: 12px;
+      font-size: 14px;
       color: var(--text-secondary);
       text-align: center;
       line-height: 1.4;
       font-style: italic;
+      max-width: 100%;
+      padding: 0 4px;
     }
 
     .card-box-indicator {
       position: absolute;
-      bottom: 20px;
+      bottom: 16px;
       display: flex;
       gap: 6px;
     }
@@ -602,6 +613,56 @@
       { id: "v43", word: "saber", synonym: "conocer", category: "Verbo", hint: "Tener conocimiento de algo", difficulty: 1 },
       { id: "v44", word: "mirar", synonym: "observar", category: "Verbo", hint: "Dirigir la vista", difficulty: 1 },
       { id: "v45", word: "mostrar", synonym: "exhibir", category: "Verbo", hint: "Poner algo a la vista", difficulty: 2 },
+      { id: "v46", word: "abolir", synonym: "suprimir", category: "Verbo", hint: "Dejar sin vigor una ley", difficulty: 2 },
+      { id: "v47", word: "acudir", synonym: "asistir", category: "Verbo", hint: "Ir a un lugar", difficulty: 1 },
+      { id: "v48", word: "advertir", synonym: "avisar", category: "Verbo", hint: "Poner sobre aviso", difficulty: 1 },
+      { id: "v49", word: "agregar", synonym: "añadir", category: "Verbo", hint: "Sumar algo más", difficulty: 1 },
+      { id: "v50", word: "aliviar", synonym: "mitigar", category: "Verbo", hint: "Reducir una molestia", difficulty: 2 },
+      { id: "v51", word: "alzar", synonym: "elevar", category: "Verbo", hint: "Mover hacia arriba", difficulty: 1 },
+      { id: "v52", word: "amenazar", synonym: "intimidar", category: "Verbo", hint: "Infundir miedo", difficulty: 1 },
+      { id: "v53", word: "aportar", synonym: "contribuir", category: "Verbo", hint: "Dar algo para un fin", difficulty: 1 },
+      { id: "v54", word: "atrapar", synonym: "capturar", category: "Verbo", hint: "Coger a quien huye", difficulty: 1 },
+      { id: "v55", word: "aumentar", synonym: "incrementar", category: "Verbo", hint: "Hacer mayor en cantidad", difficulty: 1 },
+      { id: "v56", word: "avistar", synonym: "divisar", category: "Verbo", hint: "Ver algo a lo lejos", difficulty: 2 },
+      { id: "v57", word: "brotar", synonym: "germinar", category: "Verbo", hint: "Salir una planta de la tierra", difficulty: 2 },
+      { id: "v58", word: "carecer", synonym: "faltar", category: "Verbo", hint: "No tener algo", difficulty: 1 },
+      { id: "v59", word: "castigar", synonym: "sancionar", category: "Verbo", hint: "Imponer una pena", difficulty: 1 },
+      { id: "v60", word: "cesar", synonym: "parar", category: "Verbo", hint: "Dejar de hacer algo", difficulty: 1 },
+      { id: "v61", word: "colocar", synonym: "situar", category: "Verbo", hint: "Poner en un lugar", difficulty: 1 },
+      { id: "v62", word: "combatir", synonym: "luchar", category: "Verbo", hint: "Pelear contra algo o alguien", difficulty: 1 },
+      { id: "v63", word: "concluir", synonym: "finalizar", category: "Verbo", hint: "Dar fin a algo", difficulty: 1 },
+      { id: "v64", word: "conducir", synonym: "guiar", category: "Verbo", hint: "Llevar en una dirección", difficulty: 1 },
+      { id: "v65", word: "congregar", synonym: "reunir", category: "Verbo", hint: "Juntar personas en un lugar", difficulty: 2 },
+      { id: "v66", word: "consentir", synonym: "permitir", category: "Verbo", hint: "Dar permiso", difficulty: 1 },
+      { id: "v67", word: "construir", synonym: "edificar", category: "Verbo", hint: "Levantar una obra", difficulty: 1 },
+      { id: "v68", word: "contemplar", synonym: "admirar", category: "Verbo", hint: "Mirar con atención y deleite", difficulty: 1 },
+      { id: "v69", word: "convencer", synonym: "persuadir", category: "Verbo", hint: "Lograr que alguien acepte algo", difficulty: 2 },
+      { id: "v70", word: "cruzar", synonym: "atravesar", category: "Verbo", hint: "Pasar de un lado a otro", difficulty: 1 },
+      { id: "v71", word: "dañar", synonym: "perjudicar", category: "Verbo", hint: "Causar mal a algo o alguien", difficulty: 1 },
+      { id: "v72", word: "delatar", synonym: "denunciar", category: "Verbo", hint: "Revelar la culpa de alguien", difficulty: 2 },
+      { id: "v73", word: "deliberar", synonym: "meditar", category: "Verbo", hint: "Pensar antes de decidir", difficulty: 2 },
+      { id: "v74", word: "demoler", synonym: "derribar", category: "Verbo", hint: "Tirar abajo una construcción", difficulty: 1 },
+      { id: "v75", word: "desafiar", synonym: "retar", category: "Verbo", hint: "Provocar a alguien a competir", difficulty: 1 },
+      { id: "v76", word: "descansar", synonym: "reposar", category: "Verbo", hint: "Dejar de trabajar para recuperarse", difficulty: 1 },
+      { id: "v77", word: "descubrir", synonym: "hallar", category: "Verbo", hint: "Encontrar algo oculto", difficulty: 1 },
+      { id: "v78", word: "despreciar", synonym: "desdeñar", category: "Verbo", hint: "Considerar indigno", difficulty: 2 },
+      { id: "v79", word: "difundir", synonym: "propagar", category: "Verbo", hint: "Extender una noticia", difficulty: 2 },
+      { id: "v80", word: "disminuir", synonym: "menguar", category: "Verbo", hint: "Hacer menor en cantidad", difficulty: 2 },
+      { id: "v81", word: "elaborar", synonym: "confeccionar", category: "Verbo", hint: "Preparar algo con trabajo", difficulty: 2 },
+      { id: "v82", word: "elogiar", synonym: "alabar", category: "Verbo", hint: "Decir cosas buenas de alguien", difficulty: 2 },
+      { id: "v83", word: "emerger", synonym: "aflorar", category: "Verbo", hint: "Salir a la superficie", difficulty: 2 },
+      { id: "v84", word: "enmendar", synonym: "corregir", category: "Verbo", hint: "Rectificar un error", difficulty: 1 },
+      { id: "v85", word: "errar", synonym: "equivocarse", category: "Verbo", hint: "Cometer un fallo", difficulty: 1 },
+      { id: "v86", word: "esconder", synonym: "ocultar", category: "Verbo", hint: "Poner donde no se vea", difficulty: 1 },
+      { id: "v87", word: "exigir", synonym: "reclamar", category: "Verbo", hint: "Pedir con autoridad", difficulty: 1 },
+      { id: "v88", word: "fallecer", synonym: "morir", category: "Verbo", hint: "Dejar de vivir", difficulty: 1 },
+      { id: "v89", word: "fingir", synonym: "simular", category: "Verbo", hint: "Hacer creer algo falso", difficulty: 1 },
+      { id: "v90", word: "forjar", synonym: "fraguar", category: "Verbo", hint: "Dar forma con esfuerzo", difficulty: 2 },
+      { id: "v91", word: "fatigar", synonym: "cansar", category: "Verbo", hint: "Producir agotamiento", difficulty: 1 },
+      { id: "v92", word: "gratificar", synonym: "recompensar", category: "Verbo", hint: "Dar algo como premio", difficulty: 2 },
+      { id: "v93", word: "holgar", synonym: "descansar", category: "Verbo", hint: "Estar sin trabajar", difficulty: 2 },
+      { id: "v94", word: "impedir", synonym: "obstaculizar", category: "Verbo", hint: "Poner trabas para que no se haga", difficulty: 1 },
+      { id: "v95", word: "inquirir", synonym: "investigar", category: "Verbo", hint: "Indagar para averiguar", difficulty: 2 },
 
       // ==================== ADJETIVOS (~40) ====================
       { id: "a01", word: "bonito", synonym: "hermoso", category: "Adjetivo", hint: "Que tiene belleza", difficulty: 1 },
@@ -644,6 +705,51 @@
       { id: "a38", word: "ecuánime", synonym: "imparcial", category: "Adjetivo", hint: "Justo, sereno", difficulty: 2 },
       { id: "a39", word: "lóbrego", synonym: "sombrío", category: "Adjetivo", hint: "Oscuro, tétrico", difficulty: 3 },
       { id: "a40", word: "recio", synonym: "fuerte", category: "Adjetivo", hint: "Grueso, resistente", difficulty: 2 },
+      { id: "a41", word: "absurdo", synonym: "disparatado", category: "Adjetivo", hint: "Contrario a la razón", difficulty: 1 },
+      { id: "a42", word: "aciago", synonym: "funesto", category: "Adjetivo", hint: "De mala suerte, desafortunado", difficulty: 3 },
+      { id: "a43", word: "áspero", synonym: "rugoso", category: "Adjetivo", hint: "De superficie irregular al tacto", difficulty: 1 },
+      { id: "a44", word: "benigno", synonym: "bondadoso", category: "Adjetivo", hint: "De buen carácter, no dañino", difficulty: 2 },
+      { id: "a45", word: "breve", synonym: "conciso", category: "Adjetivo", hint: "De poca duración o extensión", difficulty: 1 },
+      { id: "a46", word: "cándido", synonym: "ingenuo", category: "Adjetivo", hint: "Sin malicia ni doblez", difficulty: 2 },
+      { id: "a47", word: "célebre", synonym: "renombrado", category: "Adjetivo", hint: "Conocido por muchos", difficulty: 2 },
+      { id: "a48", word: "copioso", synonym: "abundante", category: "Adjetivo", hint: "En gran cantidad", difficulty: 2 },
+      { id: "a49", word: "cruel", synonym: "despiadado", category: "Adjetivo", hint: "Sin compasión", difficulty: 1 },
+      { id: "a50", word: "delgado", synonym: "esbelto", category: "Adjetivo", hint: "De poco grosor", difficulty: 1 },
+      { id: "a51", word: "denso", synonym: "espeso", category: "Adjetivo", hint: "Muy compacto, apretado", difficulty: 1 },
+      { id: "a52", word: "diestro", synonym: "hábil", category: "Adjetivo", hint: "Que tiene destreza", difficulty: 2 },
+      { id: "a53", word: "dócil", synonym: "sumiso", category: "Adjetivo", hint: "Fácil de manejar o enseñar", difficulty: 2 },
+      { id: "a54", word: "duro", synonym: "rígido", category: "Adjetivo", hint: "Que resiste la deformación", difficulty: 1 },
+      { id: "a55", word: "elocuente", synonym: "persuasivo", category: "Adjetivo", hint: "Que habla con eficacia", difficulty: 2 },
+      { id: "a56", word: "endeble", synonym: "enclenque", category: "Adjetivo", hint: "Muy débil, sin consistencia", difficulty: 2 },
+      { id: "a57", word: "escueto", synonym: "lacónico", category: "Adjetivo", hint: "Muy breve, sin adornos", difficulty: 2 },
+      { id: "a58", word: "espurio", synonym: "falso", category: "Adjetivo", hint: "Que no es auténtico", difficulty: 3 },
+      { id: "a59", word: "ferviente", synonym: "apasionado", category: "Adjetivo", hint: "Con mucho fervor e intensidad", difficulty: 2 },
+      { id: "a60", word: "frugal", synonym: "austero", category: "Adjetivo", hint: "Moderado en el comer y gastar", difficulty: 2 },
+      { id: "a61", word: "galante", synonym: "caballeroso", category: "Adjetivo", hint: "Atento y cortés con las damas", difficulty: 2 },
+      { id: "a62", word: "grácil", synonym: "delicado", category: "Adjetivo", hint: "Fino, sutil y agradable", difficulty: 2 },
+      { id: "a63", word: "huraño", synonym: "arisco", category: "Adjetivo", hint: "Que rehúye el trato social", difficulty: 2 },
+      { id: "a64", word: "impetuoso", synonym: "vehemente", category: "Adjetivo", hint: "Que actúa con fuerza e impulso", difficulty: 2 },
+      { id: "a65", word: "incauto", synonym: "imprudente", category: "Adjetivo", hint: "Que no prevé el peligro", difficulty: 2 },
+      { id: "a66", word: "inédito", synonym: "novedoso", category: "Adjetivo", hint: "Nunca visto o publicado", difficulty: 2 },
+      { id: "a67", word: "insólito", synonym: "inusual", category: "Adjetivo", hint: "Raro, poco frecuente", difficulty: 2 },
+      { id: "a68", word: "intrépido", synonym: "temerario", category: "Adjetivo", hint: "Que no siente miedo ante el peligro", difficulty: 2 },
+      { id: "a69", word: "irascible", synonym: "colérico", category: "Adjetivo", hint: "Que se enfada con facilidad", difficulty: 2 },
+      { id: "a70", word: "lánguido", synonym: "decaído", category: "Adjetivo", hint: "Falto de energía y ánimo", difficulty: 2 },
+      { id: "a71", word: "letal", synonym: "mortífero", category: "Adjetivo", hint: "Que puede causar la muerte", difficulty: 2 },
+      { id: "a72", word: "liviano", synonym: "ligero", category: "Adjetivo", hint: "De poco peso", difficulty: 1 },
+      { id: "a73", word: "locuaz", synonym: "parlanchín", category: "Adjetivo", hint: "Que habla mucho", difficulty: 2 },
+      { id: "a74", word: "lúgubre", synonym: "fúnebre", category: "Adjetivo", hint: "Que inspira tristeza profunda", difficulty: 2 },
+      { id: "a75", word: "macilento", synonym: "demacrado", category: "Adjetivo", hint: "Flaco, de aspecto enfermizo", difficulty: 3 },
+      { id: "a76", word: "mesurado", synonym: "comedido", category: "Adjetivo", hint: "Moderado, que se contiene", difficulty: 2 },
+      { id: "a77", word: "nítido", synonym: "claro", category: "Adjetivo", hint: "Limpio, bien definido", difficulty: 1 },
+      { id: "a78", word: "opaco", synonym: "turbio", category: "Adjetivo", hint: "Que no deja pasar la luz", difficulty: 1 },
+      { id: "a79", word: "pérfido", synonym: "traicionero", category: "Adjetivo", hint: "Desleal, que traiciona la confianza", difficulty: 3 },
+      { id: "a80", word: "plácido", synonym: "apacible", category: "Adjetivo", hint: "Tranquilo, sosegado", difficulty: 2 },
+      { id: "a81", word: "raudo", synonym: "veloz", category: "Adjetivo", hint: "Muy rápido", difficulty: 2 },
+      { id: "a82", word: "sutil", synonym: "tenue", category: "Adjetivo", hint: "Fino, delicado, apenas perceptible", difficulty: 2 },
+      { id: "a83", word: "tenaz", synonym: "persistente", category: "Adjetivo", hint: "Que no se rinde fácilmente", difficulty: 1 },
+      { id: "a84", word: "vasto", synonym: "extenso", category: "Adjetivo", hint: "Muy grande en extensión", difficulty: 2 },
+      { id: "a85", word: "zalamero", synonym: "adulador", category: "Adjetivo", hint: "Que halaga para conseguir algo", difficulty: 2 },
 
       // ==================== SUSTANTIVOS (~35) ====================
       { id: "s01", word: "acervo", synonym: "patrimonio", category: "Sustantivo", hint: "Conjunto de bienes culturales", difficulty: 2 },
@@ -681,6 +787,51 @@
       { id: "s33", word: "estrago", synonym: "devastación", category: "Sustantivo", hint: "Daño grande", difficulty: 2 },
       { id: "s34", word: "holganza", synonym: "ociosidad", category: "Sustantivo", hint: "Descanso, falta de actividad", difficulty: 2 },
       { id: "s35", word: "índole", synonym: "naturaleza", category: "Sustantivo", hint: "Condición o carácter propio", difficulty: 2 },
+      { id: "s36", word: "adversidad", synonym: "infortunio", category: "Sustantivo", hint: "Situación desfavorable", difficulty: 1 },
+      { id: "s37", word: "afán", synonym: "empeño", category: "Sustantivo", hint: "Esfuerzo intenso por conseguir algo", difficulty: 1 },
+      { id: "s38", word: "agravio", synonym: "ofensa", category: "Sustantivo", hint: "Daño al honor de alguien", difficulty: 2 },
+      { id: "s39", word: "alborozo", synonym: "júbilo", category: "Sustantivo", hint: "Alegría extraordinaria", difficulty: 2 },
+      { id: "s40", word: "alcurnia", synonym: "linaje", category: "Sustantivo", hint: "Ascendencia noble", difficulty: 3 },
+      { id: "s41", word: "apogeo", synonym: "auge", category: "Sustantivo", hint: "Punto más alto de algo", difficulty: 2 },
+      { id: "s42", word: "arrojo", synonym: "osadía", category: "Sustantivo", hint: "Valentía impetuosa", difficulty: 2 },
+      { id: "s43", word: "audacia", synonym: "atrevimiento", category: "Sustantivo", hint: "Valor para hacer algo arriesgado", difficulty: 1 },
+      { id: "s44", word: "baluarte", synonym: "bastión", category: "Sustantivo", hint: "Defensa o protección fuerte", difficulty: 2 },
+      { id: "s45", word: "bonanza", synonym: "prosperidad", category: "Sustantivo", hint: "Tiempo de calma y buena suerte", difficulty: 2 },
+      { id: "s46", word: "calamidad", synonym: "desgracia", category: "Sustantivo", hint: "Desastre que afecta a muchos", difficulty: 1 },
+      { id: "s47", word: "carestía", synonym: "escasez", category: "Sustantivo", hint: "Falta de lo necesario, precios altos", difficulty: 2 },
+      { id: "s48", word: "cautela", synonym: "precaución", category: "Sustantivo", hint: "Cuidado para evitar peligros", difficulty: 1 },
+      { id: "s49", word: "clemencia", synonym: "piedad", category: "Sustantivo", hint: "Compasión al castigar", difficulty: 2 },
+      { id: "s50", word: "concordia", synonym: "armonía", category: "Sustantivo", hint: "Acuerdo entre personas", difficulty: 2 },
+      { id: "s51", word: "congoja", synonym: "angustia", category: "Sustantivo", hint: "Pena que oprime el ánimo", difficulty: 2 },
+      { id: "s52", word: "crepúsculo", synonym: "ocaso", category: "Sustantivo", hint: "Luz entre el día y la noche", difficulty: 2 },
+      { id: "s53", word: "denuedo", synonym: "brío", category: "Sustantivo", hint: "Esfuerzo y valor decidido", difficulty: 3 },
+      { id: "s54", word: "derroche", synonym: "despilfarro", category: "Sustantivo", hint: "Gasto excesivo e innecesario", difficulty: 1 },
+      { id: "s55", word: "desasosiego", synonym: "inquietud", category: "Sustantivo", hint: "Falta de tranquilidad", difficulty: 2 },
+      { id: "s56", word: "diatriba", synonym: "invectiva", category: "Sustantivo", hint: "Discurso violento contra alguien", difficulty: 3 },
+      { id: "s57", word: "discrepancia", synonym: "desacuerdo", category: "Sustantivo", hint: "Diferencia de opiniones", difficulty: 1 },
+      { id: "s58", word: "emboscada", synonym: "celada", category: "Sustantivo", hint: "Ataque oculto por sorpresa", difficulty: 2 },
+      { id: "s59", word: "enjundia", synonym: "sustancia", category: "Sustantivo", hint: "Lo más importante de algo", difficulty: 3 },
+      { id: "s60", word: "escarnio", synonym: "burla", category: "Sustantivo", hint: "Mofa cruel e hiriente", difficulty: 2 },
+      { id: "s61", word: "estirpe", synonym: "linaje", category: "Sustantivo", hint: "Raíz y tronco de una familia", difficulty: 2 },
+      { id: "s62", word: "euforia", synonym: "entusiasmo", category: "Sustantivo", hint: "Sensación intensa de bienestar", difficulty: 1 },
+      { id: "s63", word: "fastidio", synonym: "hastío", category: "Sustantivo", hint: "Disgusto, aburrimiento", difficulty: 1 },
+      { id: "s64", word: "galardón", synonym: "premio", category: "Sustantivo", hint: "Recompensa por un mérito", difficulty: 2 },
+      { id: "s65", word: "gentío", synonym: "muchedumbre", category: "Sustantivo", hint: "Gran cantidad de gente reunida", difficulty: 1 },
+      { id: "s66", word: "holgura", synonym: "amplitud", category: "Sustantivo", hint: "Espacio o desahogo suficiente", difficulty: 2 },
+      { id: "s67", word: "incertidumbre", synonym: "duda", category: "Sustantivo", hint: "Falta de certeza sobre algo", difficulty: 1 },
+      { id: "s68", word: "indulgencia", synonym: "tolerancia", category: "Sustantivo", hint: "Facilidad para perdonar", difficulty: 2 },
+      { id: "s69", word: "letargo", synonym: "sopor", category: "Sustantivo", hint: "Estado de somnolencia profunda", difficulty: 2 },
+      { id: "s70", word: "mengua", synonym: "disminución", category: "Sustantivo", hint: "Reducción o falta de algo", difficulty: 2 },
+      { id: "s71", word: "parsimonia", synonym: "calma", category: "Sustantivo", hint: "Lentitud tranquila al actuar", difficulty: 2 },
+      { id: "s72", word: "peripecia", synonym: "aventura", category: "Sustantivo", hint: "Suceso imprevisto en una historia", difficulty: 2 },
+      { id: "s73", word: "premura", synonym: "urgencia", category: "Sustantivo", hint: "Prisa, necesidad apremiante", difficulty: 2 },
+      { id: "s74", word: "querella", synonym: "demanda", category: "Sustantivo", hint: "Queja ante un juez", difficulty: 2 },
+      { id: "s75", word: "recelo", synonym: "desconfianza", category: "Sustantivo", hint: "Temor de que algo malo pase", difficulty: 2 },
+      { id: "s76", word: "sabiduría", synonym: "erudición", category: "Sustantivo", hint: "Conocimiento profundo", difficulty: 1 },
+      { id: "s77", word: "tregua", synonym: "descanso", category: "Sustantivo", hint: "Pausa en un conflicto", difficulty: 1 },
+      { id: "s78", word: "vehemencia", synonym: "ímpetu", category: "Sustantivo", hint: "Fuerza e intensidad al actuar", difficulty: 2 },
+      { id: "s79", word: "zozobra", synonym: "ansiedad", category: "Sustantivo", hint: "Inquietud por un peligro", difficulty: 2 },
+      { id: "s80", word: "vestigio", synonym: "rastro", category: "Sustantivo", hint: "Huella o señal de algo pasado", difficulty: 2 },
 
       // ==================== ARCAÍSMOS (~40) ====================
       { id: "ar01", word: "agora", synonym: "ahora", category: "Arcaísmo", hint: "Forma antigua de 'ahora'. Muy frecuente en El Quijote", difficulty: 2 },
@@ -723,6 +874,56 @@
       { id: "ar38", word: "follón", synonym: "cobarde", category: "Arcaísmo", hint: "Ruin, vil. Insulto caballeresco", difficulty: 3 },
       { id: "ar39", word: "sandio", synonym: "necio", category: "Arcaísmo", hint: "Persona simple o tonta", difficulty: 3 },
       { id: "ar40", word: "fermosura", synonym: "hermosura", category: "Arcaísmo", hint: "Belleza. Dulcinea era de gran fermosura", difficulty: 2 },
+      { id: "ar41", word: "aina", synonym: "pronto", category: "Arcaísmo", hint: "Rápidamente, enseguida", difficulty: 3 },
+      { id: "ar42", word: "albéitar", synonym: "veterinario", category: "Arcaísmo", hint: "El que cura animales. Del árabe", difficulty: 3 },
+      { id: "ar43", word: "alcázar", synonym: "palacio", category: "Arcaísmo", hint: "Fortaleza, recinto fortificado. Del árabe", difficulty: 2 },
+      { id: "ar44", word: "alfanje", synonym: "espada curva", category: "Arcaísmo", hint: "Arma blanca de hoja ancha y curva", difficulty: 3 },
+      { id: "ar45", word: "aljaba", synonym: "carcaj", category: "Arcaísmo", hint: "Funda para llevar flechas", difficulty: 3 },
+      { id: "ar46", word: "alquería", synonym: "granja", category: "Arcaísmo", hint: "Casa de campo para labranza", difficulty: 3 },
+      { id: "ar47", word: "atambor", synonym: "tambor", category: "Arcaísmo", hint: "Instrumento de percusión", difficulty: 2 },
+      { id: "ar48", word: "bacía", synonym: "palangana", category: "Arcaísmo", hint: "Vasija de barbero. Don Quijote la confundió con yelmo", difficulty: 3 },
+      { id: "ar49", word: "baldón", synonym: "insulto", category: "Arcaísmo", hint: "Ofensa, deshonra pública", difficulty: 3 },
+      { id: "ar50", word: "celada", synonym: "casco", category: "Arcaísmo", hint: "Parte de la armadura que protege la cabeza", difficulty: 2 },
+      { id: "ar51", word: "cendal", synonym: "tela fina", category: "Arcaísmo", hint: "Tejido ligero y transparente", difficulty: 3 },
+      { id: "ar52", word: "conhortar", synonym: "consolar", category: "Arcaísmo", hint: "Dar ánimo al que sufre", difficulty: 3 },
+      { id: "ar53", word: "desaguisado", synonym: "agravio", category: "Arcaísmo", hint: "Hecho contra razón y justicia", difficulty: 3 },
+      { id: "ar54", word: "entuerto", synonym: "injusticia", category: "Arcaísmo", hint: "Ofensa. 'Desfacer entuertos'", difficulty: 2 },
+      { id: "ar55", word: "fazaña", synonym: "hazaña", category: "Arcaísmo", hint: "Hecho heroico memorable", difficulty: 2 },
+      { id: "ar56", word: "fuste", synonym: "importancia", category: "Arcaísmo", hint: "Sustancia, valor. 'De poco fuste'", difficulty: 3 },
+      { id: "ar57", word: "ganapán", synonym: "mozo de carga", category: "Arcaísmo", hint: "Hombre que se gana la vida con trabajos duros", difficulty: 3 },
+      { id: "ar58", word: "henchir", synonym: "llenar", category: "Arcaísmo", hint: "Rellenar un recipiente por completo", difficulty: 2 },
+      { id: "ar59", word: "hueste", synonym: "ejército", category: "Arcaísmo", hint: "Conjunto de tropas en campaña", difficulty: 2 },
+      { id: "ar60", word: "jaez", synonym: "adorno", category: "Arcaísmo", hint: "Arreos decorativos de un caballo", difficulty: 3 },
+      { id: "ar61", word: "lacayo", synonym: "criado", category: "Arcaísmo", hint: "Sirviente que acompañaba a pie", difficulty: 2 },
+      { id: "ar62", word: "lueñe", synonym: "lejos", category: "Arcaísmo", hint: "A gran distancia", difficulty: 3 },
+      { id: "ar63", word: "maese", synonym: "maestro", category: "Arcaísmo", hint: "Título de respeto. Maese Pedro", difficulty: 2 },
+      { id: "ar64", word: "mancebo", synonym: "joven", category: "Arcaísmo", hint: "Muchacho en edad de casarse", difficulty: 2 },
+      { id: "ar65", word: "maravedí", synonym: "moneda", category: "Arcaísmo", hint: "Moneda castellana medieval de poco valor", difficulty: 2 },
+      { id: "ar66", word: "mesón", synonym: "posada", category: "Arcaísmo", hint: "Establecimiento donde se da alojamiento", difficulty: 2 },
+      { id: "ar67", word: "pechero", synonym: "plebeyo", category: "Arcaísmo", hint: "Que paga tributos. No noble", difficulty: 3 },
+      { id: "ar68", word: "pendón", synonym: "bandera", category: "Arcaísmo", hint: "Estandarte largo y estrecho", difficulty: 2 },
+      { id: "ar69", word: "prez", synonym: "honor", category: "Arcaísmo", hint: "Gloria, fama por hechos ilustres", difficulty: 3 },
+      { id: "ar70", word: "sayón", synonym: "verdugo", category: "Arcaísmo", hint: "El que ejecutaba las penas", difficulty: 3 },
+      { id: "ar71", word: "solaz", synonym: "recreo", category: "Arcaísmo", hint: "Placer, esparcimiento", difficulty: 2 },
+      { id: "ar72", word: "tañer", synonym: "tocar", category: "Arcaísmo", hint: "Hacer sonar un instrumento", difficulty: 2 },
+      { id: "ar73", word: "villano", synonym: "aldeano", category: "Arcaísmo", hint: "Habitante de una villa, no noble", difficulty: 2 },
+      { id: "ar74", word: "adarve", synonym: "muralla", category: "Arcaísmo", hint: "Camino en lo alto de una fortificación", difficulty: 3 },
+      { id: "ar75", word: "almena", synonym: "remate de torre", category: "Arcaísmo", hint: "Cada prisma que corona una muralla", difficulty: 2 },
+      { id: "ar76", word: "yelmo", synonym: "casco", category: "Arcaísmo", hint: "Pieza de armadura para la cabeza. Yelmo de Mambrino", difficulty: 2 },
+      { id: "ar77", word: "adarga", synonym: "escudo", category: "Arcaísmo", hint: "Escudo de cuero ovalado", difficulty: 3 },
+      { id: "ar78", word: "arnés", synonym: "armadura", category: "Arcaísmo", hint: "Conjunto de armas defensivas", difficulty: 2 },
+      { id: "ar79", word: "rocín", synonym: "caballo malo", category: "Arcaísmo", hint: "Caballo flaco y de poca alzada. Rocinante", difficulty: 2 },
+      { id: "ar80", word: "venta", synonym: "posada", category: "Arcaísmo", hint: "Casa en el camino para viajeros. Don Quijote las confundía con castillos", difficulty: 2 },
+      { id: "ar81", word: "doncella", synonym: "mujer joven", category: "Arcaísmo", hint: "Mujer que no ha conocido varón", difficulty: 2 },
+      { id: "ar82", word: "afrenta", synonym: "vergüenza", category: "Arcaísmo", hint: "Deshonor por ofensa pública", difficulty: 2 },
+      { id: "ar83", word: "malferido", synonym: "muy herido", category: "Arcaísmo", hint: "Gravemente herido en batalla", difficulty: 2 },
+      { id: "ar84", word: "fazedor", synonym: "hacedor", category: "Arcaísmo", hint: "El que hace o crea (f→h)", difficulty: 2 },
+      { id: "ar85", word: "fecho", synonym: "hecho", category: "Arcaísmo", hint: "Participio antiguo de 'hacer'", difficulty: 2 },
+      { id: "ar86", word: "facienda", synonym: "asunto", category: "Arcaísmo", hint: "Negocio, quehacer. Actual 'hacienda'", difficulty: 3 },
+      { id: "ar87", word: "fermosa", synonym: "hermosa", category: "Arcaísmo", hint: "Forma femenina antigua de hermoso", difficulty: 2 },
+      { id: "ar88", word: "faltriquera", synonym: "bolsillo", category: "Arcaísmo", hint: "Bolsa que se llevaba atada a la cintura", difficulty: 3 },
+      { id: "ar89", word: "hato", synonym: "ropa", category: "Arcaísmo", hint: "Conjunto de prendas y enseres personales", difficulty: 3 },
+      { id: "ar90", word: "yantar", synonym: "comida", category: "Arcaísmo", hint: "También sustantivo: la comida del mediodía", difficulty: 2 },
 
       // ==================== CULTISMOS (~25) ====================
       { id: "c01", word: "magnánimo", synonym: "generoso", category: "Cultismo", hint: "De gran ánimo, que perdona ofensas", difficulty: 2 },
@@ -750,6 +951,36 @@
       { id: "c23", word: "desidia", synonym: "pereza", category: "Cultismo", hint: "Negligencia, falta de interés", difficulty: 2 },
       { id: "c24", word: "epítome", synonym: "resumen", category: "Cultismo", hint: "Compendio de una obra extensa", difficulty: 3 },
       { id: "c25", word: "dilapidar", synonym: "malgastar", category: "Cultismo", hint: "Gastar sin medida", difficulty: 2 },
+      { id: "c26", word: "acendrado", synonym: "puro", category: "Cultismo", hint: "Depurado, sin defecto", difficulty: 3 },
+      { id: "c27", word: "apócrifo", synonym: "falso", category: "Cultismo", hint: "Supuesto, no auténtico", difficulty: 2 },
+      { id: "c28", word: "áulico", synonym: "cortesano", category: "Cultismo", hint: "Perteneciente a la corte", difficulty: 3 },
+      { id: "c29", word: "benévolo", synonym: "bondadoso", category: "Cultismo", hint: "De buena voluntad hacia otros", difficulty: 2 },
+      { id: "c30", word: "cáustico", synonym: "mordaz", category: "Cultismo", hint: "Agresivo e hiriente al hablar", difficulty: 3 },
+      { id: "c31", word: "coetáneo", synonym: "contemporáneo", category: "Cultismo", hint: "De la misma época", difficulty: 2 },
+      { id: "c32", word: "contumaz", synonym: "obstinado", category: "Cultismo", hint: "Rebelde, que persiste en su error", difficulty: 3 },
+      { id: "c33", word: "deleznable", synonym: "despreciable", category: "Cultismo", hint: "Que merece rechazo", difficulty: 2 },
+      { id: "c34", word: "diligente", synonym: "solícito", category: "Cultismo", hint: "Cuidadoso y pronto en el obrar", difficulty: 2 },
+      { id: "c35", word: "displicente", synonym: "desdeñoso", category: "Cultismo", hint: "Que muestra indiferencia despectiva", difficulty: 3 },
+      { id: "c36", word: "encomio", synonym: "elogio", category: "Cultismo", hint: "Alabanza expresada con énfasis", difficulty: 3 },
+      { id: "c37", word: "erudito", synonym: "sabio", category: "Cultismo", hint: "Persona de gran conocimiento", difficulty: 2 },
+      { id: "c38", word: "execrable", synonym: "detestable", category: "Cultismo", hint: "Digno de ser maldecido", difficulty: 3 },
+      { id: "c39", word: "facundo", synonym: "elocuente", category: "Cultismo", hint: "Que habla con facilidad y gracia", difficulty: 3 },
+      { id: "c40", word: "falaz", synonym: "engañoso", category: "Cultismo", hint: "Que contiene falsedad", difficulty: 2 },
+      { id: "c41", word: "idóneo", synonym: "apto", category: "Cultismo", hint: "Adecuado para un fin", difficulty: 2 },
+      { id: "c42", word: "impávido", synonym: "sereno", category: "Cultismo", hint: "Sin mostrar miedo ni turbación", difficulty: 2 },
+      { id: "c43", word: "ingente", synonym: "enorme", category: "Cultismo", hint: "Muy grande en tamaño o cantidad", difficulty: 2 },
+      { id: "c44", word: "mendaz", synonym: "mentiroso", category: "Cultismo", hint: "Que tiene costumbre de mentir", difficulty: 3 },
+      { id: "c45", word: "munificente", synonym: "espléndido", category: "Cultismo", hint: "Generoso con magnificencia", difficulty: 3 },
+      { id: "c46", word: "nimio", synonym: "insignificante", category: "Cultismo", hint: "Sin importancia, mínimo", difficulty: 2 },
+      { id: "c47", word: "oblicuo", synonym: "sesgado", category: "Cultismo", hint: "Inclinado, no recto", difficulty: 2 },
+      { id: "c48", word: "pueril", synonym: "infantil", category: "Cultismo", hint: "Propio de niños, inmaduro", difficulty: 2 },
+      { id: "c49", word: "recalcitrante", synonym: "terco", category: "Cultismo", hint: "Obstinado en la resistencia", difficulty: 2 },
+      { id: "c50", word: "sagaz", synonym: "astuto", category: "Cultismo", hint: "De agudo entendimiento práctico", difficulty: 2 },
+      { id: "c51", word: "vesánico", synonym: "demente", category: "Cultismo", hint: "Loco, furioso", difficulty: 3 },
+      { id: "c52", word: "anuencia", synonym: "consentimiento", category: "Cultismo", hint: "Permiso o aprobación", difficulty: 3 },
+      { id: "c53", word: "exégesis", synonym: "interpretación", category: "Cultismo", hint: "Explicación de un texto", difficulty: 3 },
+      { id: "c54", word: "connivencia", synonym: "complicidad", category: "Cultismo", hint: "Tolerancia ante algo ilícito", difficulty: 3 },
+      { id: "c55", word: "efugio", synonym: "escapatoria", category: "Cultismo", hint: "Salida o recurso para evadir", difficulty: 3 },
 
       // ==================== EDUCACIÓN / LITERARIO (~25) ====================
       { id: "e01", word: "pedagogo", synonym: "maestro", category: "Educación", hint: "Persona que se dedica a la enseñanza", difficulty: 1 },
@@ -777,6 +1008,36 @@
       { id: "e23", word: "prosa", synonym: "texto sin verso", category: "Educación", hint: "Forma natural del lenguaje, sin rima ni medida", difficulty: 1 },
       { id: "e24", word: "aliteración", synonym: "repetición de sonidos", category: "Educación", hint: "'Con el ala aleve del leve abanico'", difficulty: 2 },
       { id: "e25", word: "oxímoron", synonym: "contradicción", category: "Educación", hint: "Unir opuestos: 'silencio atronador'", difficulty: 2 },
+      { id: "e26", word: "asíndeton", synonym: "sin conjunciones", category: "Educación", hint: "Omisión de nexos: 'vine, vi, vencí'", difficulty: 3 },
+      { id: "e27", word: "polisíndeton", synonym: "muchas conjunciones", category: "Educación", hint: "Repetición de nexos: 'y corre y salta y ríe'", difficulty: 3 },
+      { id: "e28", word: "fonema", synonym: "sonido mínimo", category: "Educación", hint: "Unidad mínima de sonido que distingue significados", difficulty: 2 },
+      { id: "e29", word: "grafema", synonym: "letra", category: "Educación", hint: "Representación escrita de un fonema", difficulty: 2 },
+      { id: "e30", word: "lexema", synonym: "raíz", category: "Educación", hint: "Parte de la palabra con significado propio: 'niñ-' en 'niños'", difficulty: 2 },
+      { id: "e31", word: "morfema", synonym: "unidad mínima", category: "Educación", hint: "Unidad más pequeña con significado gramatical: '-s', '-ción'", difficulty: 2 },
+      { id: "e32", word: "sintagma", synonym: "grupo de palabras", category: "Educación", hint: "Conjunto de palabras con una función: 'el gato negro'", difficulty: 2 },
+      { id: "e33", word: "semántica", synonym: "significado", category: "Educación", hint: "Estudio del significado de las palabras", difficulty: 1 },
+      { id: "e34", word: "sintaxis", synonym: "estructura", category: "Educación", hint: "Estudio del orden de las palabras en la oración", difficulty: 1 },
+      { id: "e35", word: "pragmática", synonym: "uso del lenguaje", category: "Educación", hint: "Estudio del lenguaje según el contexto", difficulty: 2 },
+      { id: "e36", word: "lírica", synonym: "poesía", category: "Educación", hint: "Género que expresa sentimientos subjetivos", difficulty: 1 },
+      { id: "e37", word: "dramática", synonym: "teatro", category: "Educación", hint: "Género para ser representado en escena", difficulty: 1 },
+      { id: "e38", word: "narrativa", synonym: "relato", category: "Educación", hint: "Género que cuenta una historia con narrador", difficulty: 1 },
+      { id: "e39", word: "soneto", synonym: "14 versos", category: "Educación", hint: "Composición de 2 cuartetos + 2 tercetos", difficulty: 2 },
+      { id: "e40", word: "romance", synonym: "versos octosílabos", category: "Educación", hint: "Serie de versos de 8 sílabas, rima asonante en pares", difficulty: 2 },
+      { id: "e41", word: "sinalefa", synonym: "unión de vocales", category: "Educación", hint: "Unir vocal final con inicial al medir versos", difficulty: 3 },
+      { id: "e42", word: "diéresis", synonym: "separar vocales", category: "Educación", hint: "Romper un diptongo para sumar una sílaba al verso", difficulty: 3 },
+      { id: "e43", word: "hemistiquio", synonym: "medio verso", category: "Educación", hint: "Cada mitad de un verso dividido por cesura", difficulty: 3 },
+      { id: "e44", word: "protagonista", synonym: "personaje principal", category: "Educación", hint: "El personaje central de la historia", difficulty: 1 },
+      { id: "e45", word: "antagonista", synonym: "oponente", category: "Educación", hint: "Personaje que se opone al protagonista", difficulty: 1 },
+      { id: "e46", word: "clímax", synonym: "punto culminante", category: "Educación", hint: "Momento de máxima tensión en la trama", difficulty: 1 },
+      { id: "e47", word: "desenlace", synonym: "final", category: "Educación", hint: "Resolución de los conflictos de la historia", difficulty: 1 },
+      { id: "e48", word: "verso libre", synonym: "sin métrica fija", category: "Educación", hint: "Verso que no sigue un patrón de rima o medida", difficulty: 2 },
+      { id: "e49", word: "apóstrofe", synonym: "invocación", category: "Educación", hint: "Dirigirse a algo ausente: '¡Oh, libertad!'", difficulty: 3 },
+      { id: "e50", word: "perífrasis", synonym: "rodeo", category: "Educación", hint: "Decir con muchas palabras lo que cabe en pocas", difficulty: 2 },
+      { id: "e51", word: "ironía", synonym: "sarcasmo", category: "Educación", hint: "Decir lo contrario de lo que se piensa", difficulty: 1 },
+      { id: "e52", word: "onomatopeya", synonym: "imitación sonora", category: "Educación", hint: "Palabra que imita un sonido: 'miau', 'tic-tac'", difficulty: 1 },
+      { id: "e53", word: "encabalgamiento", synonym: "verso partido", category: "Educación", hint: "Frase que no termina al final del verso y sigue en el siguiente", difficulty: 2 },
+      { id: "e54", word: "hipérbaton", synonym: "orden alterado", category: "Educación", hint: "Alterar el orden natural de la frase: 'Del salón en el ángulo oscuro'", difficulty: 2 },
+      { id: "e55", word: "polisemia", synonym: "varios significados", category: "Educación", hint: "Palabra con múltiples acepciones: 'banco' (asiento/entidad)", difficulty: 2 },
     ];
 
     // Extraer categorías únicas
@@ -919,6 +1180,15 @@
       if (d === 1) return '⭐';
       if (d === 2) return '⭐⭐';
       return '⭐⭐⭐';
+    }
+
+    // Auto-tamaño: palabras largas se muestran más pequeñas
+    function getWordSizeClass(text) {
+      const len = text.length;
+      if (len <= 10) return 'size-xl';
+      if (len <= 16) return 'size-lg';
+      if (len <= 24) return 'size-md';
+      return 'size-sm';
     }
 
     function toggleCategory(cat) {
@@ -1136,14 +1406,14 @@
                 <div class="card-face card-front">
                   <div class="card-category">${card.category}</div>
                   <div class="card-difficulty">${getDifficultyStars(card.difficulty)}</div>
-                  <div class="card-word">${card.word}</div>
+                  <div class="card-word ${getWordSizeClass(card.word)}">${card.word}</div>
                   <div class="card-box-indicator">
                     ${[1,2,3,4,5].map(i => `<div class="box-dot ${i <= box ? 'filled' : ''}"></div>`).join('')}
                   </div>
                 </div>
                 <div class="card-face card-back">
                   <div class="card-category">${card.category}</div>
-                  <div class="card-word">${card.synonym}</div>
+                  <div class="card-word ${getWordSizeClass(card.synonym)}">${card.synonym}</div>
                   ${card.hint ? `<div class="card-hint">${card.hint}</div>` : ''}
                   <div class="card-box-indicator">
                     ${[1,2,3,4,5].map(i => `<div class="box-dot ${i <= box ? 'filled' : ''}"></div>`).join('')}
