@@ -266,11 +266,11 @@
     .progress-info {
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 12px;
     }
 
     .progress-stat {
-      font-size: 14px;
+      font-size: 13px;
       color: var(--text-secondary);
     }
 
@@ -280,13 +280,125 @@
     }
 
     .accuracy {
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 600;
     }
 
     .accuracy.good { color: var(--success); }
     .accuracy.mid { color: #F59E0B; }
     .accuracy.bad { color: var(--danger); }
+
+    /* Gamificación: XP */
+    .xp-bar-container {
+      width: 100%;
+      background: var(--surface);
+      border-radius: 8px;
+      height: 6px;
+      overflow: hidden;
+    }
+
+    .xp-bar {
+      height: 100%;
+      background: var(--primary);
+      border-radius: 8px;
+      transition: width 0.5s ease;
+    }
+
+    .xp-display {
+      font-size: 13px;
+      color: var(--primary-light);
+      font-weight: 600;
+    }
+
+    .streak-badge {
+      font-size: 13px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 8px;
+      animation: pulse 0.3s ease;
+    }
+
+    .streak-fire {
+      background: rgba(249, 115, 22, 0.15);
+      color: #F97316;
+    }
+
+    .streak-ice {
+      background: rgba(56, 189, 248, 0.15);
+      color: #38BDF8;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.15); }
+      100% { transform: scale(1); }
+    }
+
+    @keyframes xpPop {
+      0% { opacity: 1; transform: translateY(0); }
+      100% { opacity: 0; transform: translateY(-30px); }
+    }
+
+    .xp-popup {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 28px;
+      font-weight: 700;
+      pointer-events: none;
+      z-index: 100;
+      animation: xpPop 0.8s ease forwards;
+    }
+
+    .xp-popup.correct { color: var(--success); }
+    .xp-popup.incorrect { color: var(--danger); }
+
+    /* Nivel en inicio */
+    .level-section {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 16px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .level-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .level-name {
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .level-xp {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    /* Summary mejorado */
+    .summary-xp-gained {
+      text-align: center;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--primary-light);
+      padding: 8px 0;
+    }
+
+    .summary-level-up {
+      text-align: center;
+      font-size: 18px;
+      font-weight: 700;
+      color: #F59E0B;
+      padding: 8px 0;
+      animation: pulse 0.5s ease;
+    }
 
     /* ========== LA TARJETA (FLASHCARD) ========== */
     .card-area {
@@ -1111,6 +1223,7 @@
     function clearAllData() {
       localStorage.removeItem(STORAGE_PREFIX + 'progress');
       localStorage.removeItem(STORAGE_PREFIX + 'settings');
+      localStorage.removeItem(STORAGE_PREFIX + 'xp');
     }
 
     // ===================================================================
@@ -1204,22 +1317,73 @@
     }
 
     // ===================================================================
+    // GAMIFICACIÓN: XP + NIVELES
+    // ===================================================================
+    const LEVELS = [
+      { name: 'Principiante', xp: 0, emoji: '📖' },
+      { name: 'Aprendiz', xp: 100, emoji: '📝' },
+      { name: 'Estudiante', xp: 300, emoji: '🎒' },
+      { name: 'Conocedor', xp: 600, emoji: '🧠' },
+      { name: 'Erudito', xp: 1000, emoji: '📚' },
+      { name: 'Sabio', xp: 1600, emoji: '🦉' },
+      { name: 'Maestro', xp: 2500, emoji: '🎓' },
+      { name: 'Catedrático', xp: 4000, emoji: '👨‍🏫' },
+      { name: 'Académico', xp: 6000, emoji: '🏛️' },
+      { name: 'Leyenda', xp: 10000, emoji: '👑' },
+    ];
+
+    function loadXP() {
+      try { return parseInt(localStorage.getItem(STORAGE_PREFIX + 'xp') || '0'); }
+      catch { return 0; }
+    }
+
+    function saveXP(xp) {
+      localStorage.setItem(STORAGE_PREFIX + 'xp', String(xp));
+    }
+
+    function getLevel(xp) {
+      let level = LEVELS[0];
+      for (const l of LEVELS) {
+        if (xp >= l.xp) level = l;
+        else break;
+      }
+      return level;
+    }
+
+    function getNextLevel(xp) {
+      for (const l of LEVELS) {
+        if (xp < l.xp) return l;
+      }
+      return null; // max level
+    }
+
+    function calcXP(isCorrect, streak, difficulty) {
+      if (!isCorrect) return 0;
+      let base = 10 * difficulty; // 10, 20, 30 según dificultad
+      if (streak >= 10) base += 15;       // bonus racha larga
+      else if (streak >= 5) base += 10;   // bonus racha media
+      else if (streak >= 3) base += 5;    // bonus racha corta
+      return base;
+    }
+
+    // ===================================================================
     // APLICACIÓN
     // ===================================================================
     const app = document.getElementById('app');
 
     let state = {
-      screen: 'start', // start | playing | summary
+      screen: 'start',
       progress: loadProgress(),
       settings: loadSettings(),
+      xp: loadXP(),
       currentCard: null,
       lastCardId: null,
       isFlipped: false,
       cardAnimating: false,
-      sessionStats: { total: 0, correct: 0, incorrect: 0, streak: 0, bestStreak: 0, wrongCards: [] },
+      sessionStats: { total: 0, correct: 0, incorrect: 0, streak: 0, bestStreak: 0, maxStreak: 0, wrongCards: [], xpGained: 0, leveledUp: false, wrongStreak: 0 },
       showResetConfirm: false,
-      failsOnly: false, // modo solo fallos
-      failsPool: []     // palabras disponibles en modo fallos
+      failsOnly: false,
+      failsPool: []
     };
 
     function setState(updates) {
@@ -1273,7 +1437,7 @@
         cardAnimating: true,
         failsOnly,
         failsPool: failsOnly ? pool : [],
-        sessionStats: { total: 0, correct: 0, incorrect: 0, streak: 0, bestStreak: 0, wrongCards: [] }
+        sessionStats: { total: 0, correct: 0, incorrect: 0, streak: 0, bestStreak: 0, wrongStreak: 0, wrongCards: [], xpGained: 0, leveledUp: false }
       });
       setTimeout(() => setState({ cardAnimating: false }), 350);
     }
@@ -1283,46 +1447,66 @@
       setState({ isFlipped: true });
     }
 
+    function showXPPopup(xpGained, isCorrect) {
+      const popup = document.createElement('div');
+      popup.className = `xp-popup ${isCorrect ? 'correct' : 'incorrect'}`;
+      popup.textContent = isCorrect ? `+${xpGained} XP` : '✗';
+      document.body.appendChild(popup);
+      setTimeout(() => popup.remove(), 800);
+    }
+
     function answerCorrect() {
       if (!state.currentCard) return;
       const newProgress = handleCorrect(state.currentCard.id, state.progress);
       saveProgress(newProgress);
       const newStreak = state.sessionStats.streak + 1;
+      const xpEarned = calcXP(true, newStreak, state.currentCard.difficulty);
+      const prevLevel = getLevel(state.xp);
+      const newXP = state.xp + xpEarned;
+      const newLevel = getLevel(newXP);
+      saveXP(newXP);
+      showXPPopup(xpEarned, true);
       const stats = {
         ...state.sessionStats,
         total: state.sessionStats.total + 1,
         correct: state.sessionStats.correct + 1,
         streak: newStreak,
-        bestStreak: Math.max(newStreak, state.sessionStats.bestStreak)
+        bestStreak: Math.max(newStreak, state.sessionStats.bestStreak),
+        wrongStreak: 0,
+        xpGained: state.sessionStats.xpGained + xpEarned,
+        leveledUp: state.sessionStats.leveledUp || (newLevel.name !== prevLevel.name)
       };
-      nextCard(newProgress, stats);
+      nextCard(newProgress, stats, newXP);
     }
 
     function answerIncorrect() {
       if (!state.currentCard) return;
       const newProgress = handleIncorrect(state.currentCard.id, state.progress);
       saveProgress(newProgress);
+      showXPPopup(0, false);
+      const newWrongStreak = state.sessionStats.wrongStreak + 1;
       const stats = {
         ...state.sessionStats,
         total: state.sessionStats.total + 1,
         incorrect: state.sessionStats.incorrect + 1,
         streak: 0,
+        wrongStreak: newWrongStreak,
         wrongCards: [...state.sessionStats.wrongCards, state.currentCard]
       };
-      nextCard(newProgress, stats);
+      nextCard(newProgress, stats, state.xp);
     }
 
-    function nextCard(newProgress, stats) {
+    function nextCard(newProgress, stats, newXP) {
       const pool = state.failsOnly ? state.failsPool : SYNONYMS;
       const card = selectNextCard(pool, newProgress, state.settings.categories, state.currentCard.id);
       if (!card) {
-        // Se acabaron las palabras (posible en modo fallos)
-        setState({ progress: newProgress, sessionStats: stats, screen: 'summary' });
+        setState({ progress: newProgress, sessionStats: stats, xp: newXP, screen: 'summary' });
         return;
       }
       setState({
         progress: newProgress,
         sessionStats: stats,
+        xp: newXP,
         currentCard: card,
         lastCardId: state.currentCard.id,
         isFlipped: false,
@@ -1344,6 +1528,7 @@
       setState({
         progress: {},
         settings: { categories: CATEGORIES.slice() },
+        xp: 0,
         showResetConfirm: false
       });
     }
@@ -1366,29 +1551,50 @@
           <div class="logo">Sinoniza</div>
           <div class="subtitle">Flashcards de sinónimos para oposiciones</div>
 
-          ${stats.studied > 0 ? `
-            <div class="stats-box">
-              <div class="stat-item">
-                <div class="stat-value">${stats.studied}</div>
-                <div class="stat-label">Estudiadas</div>
+          ${(() => {
+            const level = getLevel(state.xp);
+            const next = getNextLevel(state.xp);
+            const xpInLevel = state.xp - level.xp;
+            const xpNeeded = next ? next.xp - level.xp : 1;
+            const pct = next ? Math.min(100, Math.round((xpInLevel / xpNeeded) * 100)) : 100;
+            return stats.studied > 0 ? `
+              <div class="level-section">
+                <div class="level-header">
+                  <div class="level-name">${level.emoji} ${level.name}</div>
+                  <div class="level-xp">${state.xp} XP</div>
+                </div>
+                <div class="xp-bar-container">
+                  <div class="xp-bar" style="width: ${pct}%"></div>
+                </div>
+                ${next ? `<div style="font-size: 11px; color: var(--text-muted); text-align: right;">${next.xp - state.xp} XP para ${next.emoji} ${next.name}</div>` : `<div style="font-size: 11px; color: #F59E0B; text-align: center;">¡Nivel máximo alcanzado!</div>`}
               </div>
-              <div class="stat-item">
-                <div class="stat-value">${stats.accuracy}%</div>
-                <div class="stat-label">Aciertos</div>
+              <div class="stats-box">
+                <div class="stat-item">
+                  <div class="stat-value">${stats.studied}</div>
+                  <div class="stat-label">Estudiadas</div>
+                </div>
+                <div class="stat-item">
+                  <div class="stat-value">${stats.accuracy}%</div>
+                  <div class="stat-label">Aciertos</div>
+                </div>
+                <div class="stat-item">
+                  <div class="stat-value">${stats.mastered}</div>
+                  <div class="stat-label">Dominadas</div>
+                </div>
               </div>
-              <div class="stat-item">
-                <div class="stat-value">${stats.mastered}</div>
-                <div class="stat-label">Dominadas</div>
+            ` : `
+              <div class="level-section">
+                <div class="level-header">
+                  <div class="level-name">${level.emoji} ${level.name}</div>
+                  <div class="level-xp">0 XP</div>
+                </div>
+                <div class="xp-bar-container">
+                  <div class="xp-bar" style="width: 0%"></div>
+                </div>
+                <div style="font-size: 11px; color: var(--text-muted); text-align: center;">${totalWords} palabras por descubrir</div>
               </div>
-            </div>
-          ` : `
-            <div class="stats-box">
-              <div class="stat-item" style="grid-column: 1 / -1; text-align: center;">
-                <div class="stat-value">${totalWords}</div>
-                <div class="stat-label">Palabras por aprender</div>
-              </div>
-            </div>
-          `}
+            `;
+          })()}
 
           <div class="category-section">
             <div class="category-title">Categorías</div>
@@ -1475,9 +1681,11 @@
             <div class="progress-info">
               ${state.failsOnly ? `<div class="progress-stat" style="color: var(--danger); font-weight: 600;">Solo fallos</div>` : ''}
               <div class="progress-stat"><span>${total}</span> tarjetas</div>
-              ${streak > 2 ? `<div class="progress-stat" style="color: var(--success);">🔥 ${streak}</div>` : ''}
+              ${streak >= 3 ? `<div class="streak-badge streak-fire">🔥 ${streak}</div>` : ''}
+              ${state.sessionStats.wrongStreak >= 3 ? `<div class="streak-badge streak-ice">🥶 ${state.sessionStats.wrongStreak}</div>` : ''}
             </div>
-            <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <div class="xp-display">${state.xp} XP</div>
               ${total > 0 ? `<div class="accuracy ${accClass}">${accuracy}%</div>` : ''}
               <button class="btn btn-ghost" id="btn-end">Terminar</button>
             </div>
@@ -1552,9 +1760,29 @@
         arr.findIndex(c => c.id === card.id) === idx
       );
 
+      const { xpGained, leveledUp } = state.sessionStats;
+      const level = getLevel(state.xp);
+      const next = getNextLevel(state.xp);
+      const xpInLevel = state.xp - level.xp;
+      const xpNeeded = next ? next.xp - level.xp : 1;
+      const pct = next ? Math.min(100, Math.round((xpInLevel / xpNeeded) * 100)) : 100;
+
       app.innerHTML = `
         <div class="summary-screen">
           <div class="summary-title">Sesión completada</div>
+
+          ${xpGained > 0 ? `<div class="summary-xp-gained">+${xpGained} XP</div>` : ''}
+          ${leveledUp ? `<div class="summary-level-up">🎉 ¡Subiste a ${level.emoji} ${level.name}!</div>` : ''}
+
+          <div class="level-section">
+            <div class="level-header">
+              <div class="level-name">${level.emoji} ${level.name}</div>
+              <div class="level-xp">${state.xp} XP</div>
+            </div>
+            <div class="xp-bar-container">
+              <div class="xp-bar" style="width: ${pct}%"></div>
+            </div>
+          </div>
 
           <div class="summary-stats">
             <div class="summary-stat">
