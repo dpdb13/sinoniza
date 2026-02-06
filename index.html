@@ -300,14 +300,29 @@
       backface-visibility: hidden;
       -webkit-backface-visibility: hidden;
       border-radius: var(--radius-xl);
+      display: grid;
+      grid-template-rows: 40px 1fr 24px;
+      align-items: center;
+      justify-items: center;
+      padding: 16px 20px;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .card-top-row {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .card-center {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 48px 24px 40px;
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow);
-      overflow: hidden;
+      width: 100%;
     }
 
     .card-front {
@@ -322,9 +337,6 @@
     }
 
     .card-category {
-      position: absolute;
-      top: 16px;
-      left: 16px;
       font-size: 11px;
       font-weight: 600;
       text-transform: uppercase;
@@ -336,9 +348,6 @@
     }
 
     .card-difficulty {
-      position: absolute;
-      top: 16px;
-      right: 16px;
       font-size: 16px;
     }
 
@@ -382,8 +391,6 @@
     }
 
     .card-box-indicator {
-      position: absolute;
-      bottom: 16px;
       display: flex;
       gap: 6px;
     }
@@ -1421,17 +1428,25 @@
             <div class="card-container">
               <div class="card ${state.isFlipped ? 'flipped' : ''} ${state.cardAnimating ? 'card-enter' : ''}" id="the-card">
                 <div class="card-face card-front">
-                  <div class="card-category">${card.category}</div>
-                  <div class="card-difficulty">${getDifficultyStars(card.difficulty)}</div>
-                  <div class="card-word ${getWordClasses(card.word)}">${card.word}</div>
+                  <div class="card-top-row">
+                    <div class="card-category">${card.category}</div>
+                    <div class="card-difficulty">${getDifficultyStars(card.difficulty)}</div>
+                  </div>
+                  <div class="card-center">
+                    <div class="card-word ${getWordClasses(card.word)}">${card.word}</div>
+                  </div>
                   <div class="card-box-indicator">
                     ${[1,2,3,4,5].map(i => `<div class="box-dot ${i <= box ? 'filled' : ''}"></div>`).join('')}
                   </div>
                 </div>
                 <div class="card-face card-back">
-                  <div class="card-category">${card.category}</div>
-                  <div class="card-word ${getWordClasses(card.synonym)}">${card.synonym}</div>
-                  ${card.hint ? `<div class="card-hint">${card.hint}</div>` : ''}
+                  <div class="card-top-row">
+                    <div class="card-category">${card.category}</div>
+                  </div>
+                  <div class="card-center">
+                    <div class="card-word ${getWordClasses(card.synonym)}">${card.synonym}</div>
+                    ${card.hint ? `<div class="card-hint">${card.hint}</div>` : ''}
+                  </div>
                   <div class="card-box-indicator">
                     ${[1,2,3,4,5].map(i => `<div class="box-dot ${i <= box ? 'filled' : ''}"></div>`).join('')}
                   </div>
