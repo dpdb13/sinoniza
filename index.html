@@ -1,0 +1,1257 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Sinoniza - Flashcards de Sinónimos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ========== RESET Y BASE ========== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary: #8B5CF6;
+      --primary-hover: #7C3AED;
+      --primary-light: #A78BFA;
+      --primary-pale: rgba(139, 92, 246, 0.15);
+      --success: #10B981;
+      --success-hover: #059669;
+      --danger: #EF4444;
+      --danger-hover: #DC2626;
+      --bg: #0D0D12;
+      --surface: #1A1A24;
+      --surface-hover: #252532;
+      --surface-elevated: #2A2A3A;
+      --text: #FFFFFF;
+      --text-secondary: #A0A0B8;
+      --text-muted: #6B6B80;
+      --border: #2A2A3A;
+      --radius-sm: 10px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --radius-xl: 28px;
+      --shadow: 0 4px 16px rgba(0,0,0,0.4);
+      --shadow-glow: 0 0 30px rgba(139, 92, 246, 0.2);
+    }
+
+    body {
+      font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow-x: hidden;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* ========== PANTALLA DE INICIO ========== */
+    .start-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100dvh;
+      padding: 24px;
+      width: 100%;
+      max-width: 480px;
+      gap: 32px;
+      animation: fadeIn 0.4s ease;
+    }
+
+    .logo {
+      font-size: 48px;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -1px;
+    }
+
+    .subtitle {
+      color: var(--text-secondary);
+      font-size: 16px;
+      text-align: center;
+      margin-top: -20px;
+    }
+
+    .stats-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+    }
+
+    .stat-item {
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--primary-light);
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* ========== FILTRO DE CATEGORÍAS ========== */
+    .category-section {
+      width: 100%;
+    }
+
+    .category-title {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+      font-weight: 500;
+    }
+
+    .category-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chip {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 8px 14px;
+      font-size: 13px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 150ms ease;
+      font-family: inherit;
+      user-select: none;
+    }
+
+    .chip:hover { background: var(--surface-hover); }
+
+    .chip.active {
+      background: var(--primary-pale);
+      border-color: var(--primary);
+      color: var(--primary-light);
+    }
+
+    .chip .chip-count {
+      font-size: 11px;
+      opacity: 0.6;
+      margin-left: 4px;
+    }
+
+    /* ========== BOTONES ========== */
+    .btn {
+      font-family: inherit;
+      font-size: 16px;
+      font-weight: 600;
+      border: none;
+      border-radius: var(--radius-md);
+      padding: 16px 32px;
+      cursor: pointer;
+      transition: all 150ms ease;
+      min-height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+      width: 100%;
+      font-size: 18px;
+      box-shadow: var(--shadow-glow);
+    }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-primary:active { transform: scale(0.98); }
+
+    .btn-success {
+      background: var(--success);
+      color: white;
+      flex: 1;
+    }
+    .btn-success:hover { background: var(--success-hover); }
+    .btn-success:active { transform: scale(0.96); }
+
+    .btn-danger {
+      background: var(--danger);
+      color: white;
+      flex: 1;
+    }
+    .btn-danger:hover { background: var(--danger-hover); }
+    .btn-danger:active { transform: scale(0.96); }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-secondary);
+      padding: 10px 16px;
+      font-size: 14px;
+    }
+    .btn-ghost:hover { color: var(--text); background: var(--surface); }
+
+    .btn-flip {
+      background: var(--surface-elevated);
+      color: var(--primary-light);
+      border: 1px solid var(--primary);
+      width: 100%;
+      font-size: 17px;
+    }
+    .btn-flip:hover { background: var(--primary-pale); }
+    .btn-flip:active { transform: scale(0.98); }
+
+    /* ========== PANTALLA DE JUEGO ========== */
+    .game-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100dvh;
+      padding: 16px;
+      width: 100%;
+      max-width: 480px;
+      animation: fadeIn 0.3s ease;
+    }
+
+    /* Header del juego */
+    .game-header {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0 16px;
+    }
+
+    .progress-info {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .progress-stat {
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+
+    .progress-stat span {
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .accuracy {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .accuracy.good { color: var(--success); }
+    .accuracy.mid { color: #F59E0B; }
+    .accuracy.bad { color: var(--danger); }
+
+    /* ========== LA TARJETA (FLASHCARD) ========== */
+    .card-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      gap: 24px;
+      padding: 16px 0;
+    }
+
+    .card-container {
+      width: 100%;
+      max-width: 360px;
+      aspect-ratio: 3 / 4;
+      perspective: 1000px;
+    }
+
+    .card {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: pointer;
+    }
+
+    .card.flipped {
+      transform: rotateY(180deg);
+    }
+
+    .card-face {
+      position: absolute;
+      inset: 0;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      border-radius: var(--radius-xl);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 24px;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+    }
+
+    .card-front {
+      background: linear-gradient(160deg, var(--surface) 0%, #1E1E2E 100%);
+    }
+
+    .card-back {
+      background: linear-gradient(160deg, #1a1530 0%, #0D0D12 100%);
+      transform: rotateY(180deg);
+      border-color: var(--primary);
+      box-shadow: var(--shadow-glow);
+    }
+
+    .card-category {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--primary-light);
+      background: var(--primary-pale);
+      padding: 4px 10px;
+      border-radius: 6px;
+    }
+
+    .card-difficulty {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      font-size: 18px;
+    }
+
+    .card-word {
+      font-size: 36px;
+      font-weight: 700;
+      text-align: center;
+      line-height: 1.2;
+      word-break: break-word;
+    }
+
+    .card-back .card-word {
+      color: var(--primary-light);
+    }
+
+    .card-hint {
+      margin-top: 16px;
+      font-size: 15px;
+      color: var(--text-secondary);
+      text-align: center;
+      line-height: 1.4;
+      font-style: italic;
+    }
+
+    .card-box-indicator {
+      position: absolute;
+      bottom: 20px;
+      display: flex;
+      gap: 6px;
+    }
+
+    .box-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--border);
+    }
+
+    .box-dot.filled {
+      background: var(--primary);
+    }
+
+    /* ========== BOTONES DE RESULTADO ========== */
+    .result-buttons {
+      display: flex;
+      gap: 12px;
+      width: 100%;
+      max-width: 360px;
+      animation: slideUp 0.3s ease;
+    }
+
+    .action-area {
+      width: 100%;
+      max-width: 360px;
+    }
+
+    /* ========== PANTALLA DE RESUMEN ========== */
+    .summary-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100dvh;
+      padding: 24px;
+      width: 100%;
+      max-width: 480px;
+      gap: 24px;
+      animation: fadeIn 0.4s ease;
+    }
+
+    .summary-title {
+      font-size: 32px;
+      font-weight: 700;
+      margin-top: 24px;
+    }
+
+    .summary-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      width: 100%;
+    }
+
+    .summary-stat {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      text-align: center;
+    }
+
+    .summary-stat-value {
+      font-size: 32px;
+      font-weight: 700;
+    }
+
+    .summary-stat-value.correct { color: var(--success); }
+    .summary-stat-value.incorrect { color: var(--danger); }
+    .summary-stat-value.total { color: var(--primary-light); }
+
+    .summary-stat-label {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .wrong-words-section {
+      width: 100%;
+    }
+
+    .wrong-words-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--danger);
+      margin-bottom: 12px;
+    }
+
+    .wrong-word-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 12px 16px;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .wrong-word-item .word { font-weight: 600; }
+    .wrong-word-item .arrow { color: var(--text-muted); margin: 0 8px; }
+    .wrong-word-item .synonym { color: var(--primary-light); font-weight: 600; }
+
+    .summary-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 100%;
+      margin-top: 8px;
+    }
+
+    .btn-secondary {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      width: 100%;
+    }
+    .btn-secondary:hover { background: var(--surface-hover); }
+
+    /* ========== RESET CONFIRM ========== */
+    .reset-confirm {
+      background: var(--surface);
+      border: 1px solid var(--danger);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .reset-confirm p {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+    }
+
+    .reset-confirm-buttons {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+    }
+
+    .btn-sm {
+      padding: 8px 16px;
+      font-size: 13px;
+      min-height: auto;
+    }
+
+    /* ========== ANIMACIONES ========== */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes cardIn {
+      from { opacity: 0; transform: scale(0.92); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .card-enter {
+      animation: cardIn 0.35s ease;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .card { transition: none; }
+      .card-enter, .result-buttons, .start-screen, .game-screen, .summary-screen { animation: none; }
+    }
+
+    /* ========== RESPONSIVE ========== */
+    @media (min-width: 768px) {
+      .card-container {
+        max-width: 400px;
+      }
+      .card-word {
+        font-size: 42px;
+      }
+    }
+
+    /* Ocultar scrollbar */
+    body::-webkit-scrollbar { display: none; }
+    body { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+
+  <script>
+    // ===================================================================
+    // BASE DE DATOS DE SINÓNIMOS (210+ pares)
+    // ===================================================================
+    const SYNONYMS = [
+      // ==================== VERBOS (~45) ====================
+      { id: "v01", word: "alegrar", synonym: "regocijar", category: "Verbo", hint: "Causar alegría", difficulty: 2 },
+      { id: "v02", word: "andar", synonym: "caminar", category: "Verbo", hint: "Desplazarse a pie", difficulty: 1 },
+      { id: "v03", word: "arrojar", synonym: "lanzar", category: "Verbo", hint: "Tirar algo con fuerza", difficulty: 1 },
+      { id: "v04", word: "auxiliar", synonym: "socorrer", category: "Verbo", hint: "Prestar ayuda", difficulty: 2 },
+      { id: "v05", word: "buscar", synonym: "indagar", category: "Verbo", hint: "Intentar encontrar algo", difficulty: 2 },
+      { id: "v06", word: "callar", synonym: "silenciar", category: "Verbo", hint: "Dejar de hablar", difficulty: 1 },
+      { id: "v07", word: "comenzar", synonym: "iniciar", category: "Verbo", hint: "Dar principio a algo", difficulty: 1 },
+      { id: "v08", word: "comprender", synonym: "entender", category: "Verbo", hint: "Captar el significado", difficulty: 1 },
+      { id: "v09", word: "conseguir", synonym: "obtener", category: "Verbo", hint: "Lograr algo", difficulty: 1 },
+      { id: "v10", word: "crear", synonym: "inventar", category: "Verbo", hint: "Producir algo nuevo", difficulty: 1 },
+      { id: "v11", word: "desear", synonym: "anhelar", category: "Verbo", hint: "Querer con intensidad", difficulty: 2 },
+      { id: "v12", word: "destruir", synonym: "aniquilar", category: "Verbo", hint: "Acabar con algo por completo", difficulty: 2 },
+      { id: "v13", word: "dudar", synonym: "vacilar", category: "Verbo", hint: "No estar seguro", difficulty: 1 },
+      { id: "v14", word: "elegir", synonym: "seleccionar", category: "Verbo", hint: "Escoger entre opciones", difficulty: 1 },
+      { id: "v15", word: "emplear", synonym: "utilizar", category: "Verbo", hint: "Hacer uso de algo", difficulty: 1 },
+      { id: "v16", word: "engañar", synonym: "embaucar", category: "Verbo", hint: "Inducir a creer algo falso", difficulty: 2 },
+      { id: "v17", word: "enseñar", synonym: "instruir", category: "Verbo", hint: "Transmitir conocimientos", difficulty: 1 },
+      { id: "v18", word: "escribir", synonym: "redactar", category: "Verbo", hint: "Componer un texto", difficulty: 1 },
+      { id: "v19", word: "estimar", synonym: "apreciar", category: "Verbo", hint: "Valorar algo o a alguien", difficulty: 1 },
+      { id: "v20", word: "examinar", synonym: "analizar", category: "Verbo", hint: "Estudiar con detalle", difficulty: 1 },
+      { id: "v21", word: "ganar", synonym: "conquistar", category: "Verbo", hint: "Alcanzar la victoria", difficulty: 1 },
+      { id: "v22", word: "hablar", synonym: "dialogar", category: "Verbo", hint: "Comunicarse con palabras", difficulty: 1 },
+      { id: "v23", word: "imitar", synonym: "emular", category: "Verbo", hint: "Copiar las acciones de otro", difficulty: 2 },
+      { id: "v24", word: "jurar", synonym: "prometer", category: "Verbo", hint: "Comprometerse solemnemente", difficulty: 1 },
+      { id: "v25", word: "llorar", synonym: "sollozar", category: "Verbo", hint: "Derramar lágrimas", difficulty: 1 },
+      { id: "v26", word: "morar", synonym: "habitar", category: "Verbo", hint: "Vivir en un lugar", difficulty: 2 },
+      { id: "v27", word: "obedecer", synonym: "acatar", category: "Verbo", hint: "Cumplir una orden", difficulty: 2 },
+      { id: "v28", word: "pensar", synonym: "reflexionar", category: "Verbo", hint: "Ejercitar la mente", difficulty: 1 },
+      { id: "v29", word: "querer", synonym: "amar", category: "Verbo", hint: "Sentir afecto profundo", difficulty: 1 },
+      { id: "v30", word: "romper", synonym: "quebrar", category: "Verbo", hint: "Separar en trozos", difficulty: 1 },
+      { id: "v31", word: "subir", synonym: "ascender", category: "Verbo", hint: "Ir hacia arriba", difficulty: 1 },
+      { id: "v32", word: "sufrir", synonym: "padecer", category: "Verbo", hint: "Experimentar dolor", difficulty: 1 },
+      { id: "v33", word: "temer", synonym: "recelar", category: "Verbo", hint: "Sentir miedo", difficulty: 2 },
+      { id: "v34", word: "unir", synonym: "juntar", category: "Verbo", hint: "Poner cosas juntas", difficulty: 1 },
+      { id: "v35", word: "vencer", synonym: "derrotar", category: "Verbo", hint: "Ganar al contrario", difficulty: 1 },
+      { id: "v36", word: "confesar", synonym: "admitir", category: "Verbo", hint: "Reconocer algo", difficulty: 1 },
+      { id: "v37", word: "ceder", synonym: "conceder", category: "Verbo", hint: "Renunciar a algo en favor de otro", difficulty: 2 },
+      { id: "v38", word: "dejar", synonym: "abandonar", category: "Verbo", hint: "Separarse de algo o alguien", difficulty: 1 },
+      { id: "v39", word: "correr", synonym: "apresurar", category: "Verbo", hint: "Moverse rápidamente", difficulty: 1 },
+      { id: "v40", word: "beber", synonym: "ingerir", category: "Verbo", hint: "Tomar un líquido", difficulty: 1 },
+      { id: "v41", word: "poseer", synonym: "detentar", category: "Verbo", hint: "Tener algo en propiedad", difficulty: 2 },
+      { id: "v42", word: "nacer", synonym: "surgir", category: "Verbo", hint: "Aparecer, venir al mundo", difficulty: 1 },
+      { id: "v43", word: "saber", synonym: "conocer", category: "Verbo", hint: "Tener conocimiento de algo", difficulty: 1 },
+      { id: "v44", word: "mirar", synonym: "observar", category: "Verbo", hint: "Dirigir la vista", difficulty: 1 },
+      { id: "v45", word: "mostrar", synonym: "exhibir", category: "Verbo", hint: "Poner algo a la vista", difficulty: 2 },
+
+      // ==================== ADJETIVOS (~40) ====================
+      { id: "a01", word: "bonito", synonym: "hermoso", category: "Adjetivo", hint: "Que tiene belleza", difficulty: 1 },
+      { id: "a02", word: "rápido", synonym: "veloz", category: "Adjetivo", hint: "Que se mueve con ligereza", difficulty: 1 },
+      { id: "a03", word: "grande", synonym: "enorme", category: "Adjetivo", hint: "De mucho tamaño", difficulty: 1 },
+      { id: "a04", word: "pequeño", synonym: "diminuto", category: "Adjetivo", hint: "De poco tamaño", difficulty: 1 },
+      { id: "a05", word: "fuerte", synonym: "robusto", category: "Adjetivo", hint: "Que tiene fuerza", difficulty: 1 },
+      { id: "a06", word: "débil", synonym: "frágil", category: "Adjetivo", hint: "Que carece de fuerza", difficulty: 1 },
+      { id: "a07", word: "alegre", synonym: "contento", category: "Adjetivo", hint: "Que siente gozo", difficulty: 1 },
+      { id: "a08", word: "triste", synonym: "melancólico", category: "Adjetivo", hint: "Que siente pena", difficulty: 1 },
+      { id: "a09", word: "valiente", synonym: "audaz", category: "Adjetivo", hint: "Que no siente miedo", difficulty: 1 },
+      { id: "a10", word: "cobarde", synonym: "pusilánime", category: "Adjetivo", hint: "Que carece de valor", difficulty: 2 },
+      { id: "a11", word: "inteligente", synonym: "sagaz", category: "Adjetivo", hint: "De agudo entendimiento", difficulty: 2 },
+      { id: "a12", word: "torpe", synonym: "inepto", category: "Adjetivo", hint: "Falto de habilidad", difficulty: 2 },
+      { id: "a13", word: "generoso", synonym: "dadivoso", category: "Adjetivo", hint: "Que da con liberalidad", difficulty: 2 },
+      { id: "a14", word: "tacaño", synonym: "avaro", category: "Adjetivo", hint: "Que no quiere gastar", difficulty: 1 },
+      { id: "a15", word: "amable", synonym: "cortés", category: "Adjetivo", hint: "Que trata bien a los demás", difficulty: 1 },
+      { id: "a16", word: "grosero", synonym: "descortés", category: "Adjetivo", hint: "Falto de educación", difficulty: 1 },
+      { id: "a17", word: "fiel", synonym: "leal", category: "Adjetivo", hint: "Que guarda fidelidad", difficulty: 1 },
+      { id: "a18", word: "humilde", synonym: "modesto", category: "Adjetivo", hint: "Que no presume", difficulty: 1 },
+      { id: "a19", word: "soberbio", synonym: "arrogante", category: "Adjetivo", hint: "Que se cree superior", difficulty: 1 },
+      { id: "a20", word: "joven", synonym: "mozo", category: "Adjetivo", hint: "De poca edad", difficulty: 1 },
+      { id: "a21", word: "viejo", synonym: "anciano", category: "Adjetivo", hint: "De mucha edad", difficulty: 1 },
+      { id: "a22", word: "nuevo", synonym: "flamante", category: "Adjetivo", hint: "Recién hecho o estrenado", difficulty: 2 },
+      { id: "a23", word: "antiguo", synonym: "vetusto", category: "Adjetivo", hint: "Muy viejo o del pasado", difficulty: 2 },
+      { id: "a24", word: "limpio", synonym: "pulcro", category: "Adjetivo", hint: "Sin suciedad", difficulty: 2 },
+      { id: "a25", word: "sucio", synonym: "mugriento", category: "Adjetivo", hint: "Que tiene suciedad", difficulty: 1 },
+      { id: "a26", word: "oscuro", synonym: "tenebroso", category: "Adjetivo", hint: "Falto de luz", difficulty: 2 },
+      { id: "a27", word: "claro", synonym: "diáfano", category: "Adjetivo", hint: "Que deja pasar la luz", difficulty: 2 },
+      { id: "a28", word: "profundo", synonym: "hondo", category: "Adjetivo", hint: "De mucha profundidad", difficulty: 1 },
+      { id: "a29", word: "efímero", synonym: "fugaz", category: "Adjetivo", hint: "Que dura muy poco", difficulty: 2 },
+      { id: "a30", word: "perenne", synonym: "perpetuo", category: "Adjetivo", hint: "Que dura siempre", difficulty: 2 },
+      { id: "a31", word: "magnífico", synonym: "espléndido", category: "Adjetivo", hint: "Extraordinariamente bueno", difficulty: 1 },
+      { id: "a32", word: "exiguo", synonym: "escaso", category: "Adjetivo", hint: "Muy reducido, insuficiente", difficulty: 2 },
+      { id: "a33", word: "fecundo", synonym: "fértil", category: "Adjetivo", hint: "Que produce abundantemente", difficulty: 2 },
+      { id: "a34", word: "parco", synonym: "sobrio", category: "Adjetivo", hint: "Moderado, contenido", difficulty: 2 },
+      { id: "a35", word: "prolijo", synonym: "extenso", category: "Adjetivo", hint: "Largo, muy detallado", difficulty: 2 },
+      { id: "a36", word: "somero", synonym: "superficial", category: "Adjetivo", hint: "Poco profundo, ligero", difficulty: 2 },
+      { id: "a37", word: "prístino", synonym: "inmaculado", category: "Adjetivo", hint: "Original, puro", difficulty: 3 },
+      { id: "a38", word: "ecuánime", synonym: "imparcial", category: "Adjetivo", hint: "Justo, sereno", difficulty: 2 },
+      { id: "a39", word: "lóbrego", synonym: "sombrío", category: "Adjetivo", hint: "Oscuro, tétrico", difficulty: 3 },
+      { id: "a40", word: "recio", synonym: "fuerte", category: "Adjetivo", hint: "Grueso, resistente", difficulty: 2 },
+
+      // ==================== SUSTANTIVOS (~35) ====================
+      { id: "s01", word: "acervo", synonym: "patrimonio", category: "Sustantivo", hint: "Conjunto de bienes culturales", difficulty: 2 },
+      { id: "s02", word: "alianza", synonym: "pacto", category: "Sustantivo", hint: "Acuerdo entre partes", difficulty: 1 },
+      { id: "s03", word: "astucia", synonym: "sagacidad", category: "Sustantivo", hint: "Habilidad para engañar o evitar engaños", difficulty: 2 },
+      { id: "s04", word: "batalla", synonym: "combate", category: "Sustantivo", hint: "Lucha entre fuerzas opuestas", difficulty: 1 },
+      { id: "s05", word: "camino", synonym: "sendero", category: "Sustantivo", hint: "Vía para transitar", difficulty: 1 },
+      { id: "s06", word: "causa", synonym: "motivo", category: "Sustantivo", hint: "Razón de algo", difficulty: 1 },
+      { id: "s07", word: "cima", synonym: "cumbre", category: "Sustantivo", hint: "Parte más alta", difficulty: 1 },
+      { id: "s08", word: "codicia", synonym: "avaricia", category: "Sustantivo", hint: "Deseo desmedido de riquezas", difficulty: 2 },
+      { id: "s09", word: "contienda", synonym: "disputa", category: "Sustantivo", hint: "Enfrentamiento, pelea", difficulty: 2 },
+      { id: "s10", word: "coraje", synonym: "valor", category: "Sustantivo", hint: "Ánimo para enfrentar peligros", difficulty: 1 },
+      { id: "s11", word: "destino", synonym: "sino", category: "Sustantivo", hint: "Fuerza que determina el futuro", difficulty: 2 },
+      { id: "s12", word: "dicha", synonym: "felicidad", category: "Sustantivo", hint: "Estado de gran alegría", difficulty: 1 },
+      { id: "s13", word: "dolor", synonym: "sufrimiento", category: "Sustantivo", hint: "Sensación penosa", difficulty: 1 },
+      { id: "s14", word: "enemigo", synonym: "adversario", category: "Sustantivo", hint: "El que se opone a otro", difficulty: 1 },
+      { id: "s15", word: "enigma", synonym: "misterio", category: "Sustantivo", hint: "Algo difícil de comprender", difficulty: 1 },
+      { id: "s16", word: "fama", synonym: "renombre", category: "Sustantivo", hint: "Reputación amplia", difficulty: 2 },
+      { id: "s17", word: "fuerza", synonym: "vigor", category: "Sustantivo", hint: "Capacidad para mover algo", difficulty: 1 },
+      { id: "s18", word: "gloria", synonym: "honor", category: "Sustantivo", hint: "Reconocimiento y prestigio", difficulty: 1 },
+      { id: "s19", word: "hogar", synonym: "morada", category: "Sustantivo", hint: "Lugar donde se vive", difficulty: 1 },
+      { id: "s20", word: "ira", synonym: "cólera", category: "Sustantivo", hint: "Enfado intenso", difficulty: 1 },
+      { id: "s21", word: "jefe", synonym: "líder", category: "Sustantivo", hint: "El que dirige", difficulty: 1 },
+      { id: "s22", word: "ley", synonym: "norma", category: "Sustantivo", hint: "Regla establecida", difficulty: 1 },
+      { id: "s23", word: "logro", synonym: "hazaña", category: "Sustantivo", hint: "Algo conseguido con mérito", difficulty: 1 },
+      { id: "s24", word: "miedo", synonym: "temor", category: "Sustantivo", hint: "Sensación ante un peligro", difficulty: 1 },
+      { id: "s25", word: "pena", synonym: "aflicción", category: "Sustantivo", hint: "Tristeza profunda", difficulty: 1 },
+      { id: "s26", word: "pueblo", synonym: "aldea", category: "Sustantivo", hint: "Población pequeña", difficulty: 1 },
+      { id: "s27", word: "riqueza", synonym: "opulencia", category: "Sustantivo", hint: "Abundancia de bienes", difficulty: 2 },
+      { id: "s28", word: "ruido", synonym: "estruendo", category: "Sustantivo", hint: "Sonido fuerte y confuso", difficulty: 1 },
+      { id: "s29", word: "tesoro", synonym: "fortuna", category: "Sustantivo", hint: "Conjunto de cosas valiosas", difficulty: 1 },
+      { id: "s30", word: "virtud", synonym: "bondad", category: "Sustantivo", hint: "Cualidad moral positiva", difficulty: 1 },
+      { id: "s31", word: "ardid", synonym: "estratagema", category: "Sustantivo", hint: "Truco o maniobra hábil", difficulty: 2 },
+      { id: "s32", word: "dádiva", synonym: "regalo", category: "Sustantivo", hint: "Cosa que se da voluntariamente", difficulty: 2 },
+      { id: "s33", word: "estrago", synonym: "devastación", category: "Sustantivo", hint: "Daño grande", difficulty: 2 },
+      { id: "s34", word: "holganza", synonym: "ociosidad", category: "Sustantivo", hint: "Descanso, falta de actividad", difficulty: 2 },
+      { id: "s35", word: "índole", synonym: "naturaleza", category: "Sustantivo", hint: "Condición o carácter propio", difficulty: 2 },
+
+      // ==================== ARCAÍSMOS (~40) ====================
+      { id: "ar01", word: "agora", synonym: "ahora", category: "Arcaísmo", hint: "Forma antigua de 'ahora'. Muy frecuente en El Quijote", difficulty: 2 },
+      { id: "ar02", word: "ansí", synonym: "así", category: "Arcaísmo", hint: "Forma antigua de 'así'", difficulty: 2 },
+      { id: "ar03", word: "aqueste", synonym: "este", category: "Arcaísmo", hint: "Demostrativo arcaico", difficulty: 2 },
+      { id: "ar04", word: "acaecer", synonym: "suceder", category: "Arcaísmo", hint: "Que algo ocurra o pase", difficulty: 2 },
+      { id: "ar05", word: "asaz", synonym: "bastante", category: "Arcaísmo", hint: "Indica cantidad suficiente", difficulty: 3 },
+      { id: "ar06", word: "ca", synonym: "porque", category: "Arcaísmo", hint: "Conjunción causal medieval", difficulty: 3 },
+      { id: "ar07", word: "cuita", synonym: "pena", category: "Arcaísmo", hint: "Aflicción, sufrimiento del alma", difficulty: 3 },
+      { id: "ar08", word: "desfacer", synonym: "deshacer", category: "Arcaísmo", hint: "Forma antigua. 'Desfacer entuertos' = corregir injusticias", difficulty: 2 },
+      { id: "ar09", word: "do", synonym: "donde", category: "Arcaísmo", hint: "Adverbio de lugar medieval", difficulty: 3 },
+      { id: "ar10", word: "empero", synonym: "sin embargo", category: "Arcaísmo", hint: "Conjunción adversativa", difficulty: 3 },
+      { id: "ar11", word: "fablar", synonym: "hablar", category: "Arcaísmo", hint: "La f inicial se transformó en h en castellano moderno", difficulty: 2 },
+      { id: "ar12", word: "fermoso", synonym: "hermoso", category: "Arcaísmo", hint: "Del latín formosus. La f pasó a h", difficulty: 2 },
+      { id: "ar13", word: "fijo", synonym: "hijo", category: "Arcaísmo", hint: "Forma antigua de 'hijo' (f→h)", difficulty: 2 },
+      { id: "ar14", word: "guisa", synonym: "manera", category: "Arcaísmo", hint: "'De tal guisa' = de tal manera", difficulty: 3 },
+      { id: "ar15", word: "luengo", synonym: "largo", category: "Arcaísmo", hint: "Del latín longus", difficulty: 3 },
+      { id: "ar16", word: "maguer", synonym: "aunque", category: "Arcaísmo", hint: "Conjunción concesiva medieval", difficulty: 3 },
+      { id: "ar17", word: "malandanza", synonym: "desventura", category: "Arcaísmo", hint: "Mala suerte, infortunio", difficulty: 3 },
+      { id: "ar18", word: "menester", synonym: "necesidad", category: "Arcaísmo", hint: "'Es menester' = es necesario", difficulty: 2 },
+      { id: "ar19", word: "merced", synonym: "gracia", category: "Arcaísmo", hint: "'Vuestra merced' → usted", difficulty: 2 },
+      { id: "ar20", word: "non", synonym: "no", category: "Arcaísmo", hint: "Negación en castellano medieval", difficulty: 2 },
+      { id: "ar21", word: "ogaño", synonym: "este año", category: "Arcaísmo", hint: "Contracción de 'hoc anno' (latín)", difficulty: 3 },
+      { id: "ar22", word: "plugo", synonym: "agradó", category: "Arcaísmo", hint: "Pretérito de 'placer'. 'Plugo a Dios'", difficulty: 3 },
+      { id: "ar23", word: "priesa", synonym: "prisa", category: "Arcaísmo", hint: "Forma antigua de 'prisa'", difficulty: 2 },
+      { id: "ar24", word: "pro", synonym: "provecho", category: "Arcaísmo", hint: "Beneficio, utilidad", difficulty: 2 },
+      { id: "ar25", word: "yantar", synonym: "comer", category: "Arcaísmo", hint: "Del latín iantare. Comida principal del mediodía", difficulty: 2 },
+      { id: "ar26", word: "zampoña", synonym: "flauta pastoril", category: "Arcaísmo", hint: "Instrumento musical de viento hecho de cañas", difficulty: 2 },
+      { id: "ar27", word: "talante", synonym: "voluntad", category: "Arcaísmo", hint: "Disposición de ánimo, humor", difficulty: 2 },
+      { id: "ar28", word: "vegada", synonym: "vez", category: "Arcaísmo", hint: "'Muchas vegadas' = muchas veces", difficulty: 3 },
+      { id: "ar29", word: "vos", synonym: "usted", category: "Arcaísmo", hint: "Tratamiento de respeto medieval", difficulty: 2 },
+      { id: "ar30", word: "albricia", synonym: "buena noticia", category: "Arcaísmo", hint: "Regalo por una buena nueva", difficulty: 3 },
+      { id: "ar31", word: "algarabía", synonym: "griterío", category: "Arcaísmo", hint: "Ruido confuso de voces. Del árabe", difficulty: 2 },
+      { id: "ar32", word: "corcel", synonym: "caballo", category: "Arcaísmo", hint: "Caballo ligero, de batalla", difficulty: 2 },
+      { id: "ar33", word: "doncel", synonym: "joven noble", category: "Arcaísmo", hint: "Muchacho que servía a un caballero", difficulty: 2 },
+      { id: "ar34", word: "escudero", synonym: "sirviente", category: "Arcaísmo", hint: "Criado que acompaña a un caballero. Sancho Panza era escudero", difficulty: 2 },
+      { id: "ar35", word: "hidalgo", synonym: "noble", category: "Arcaísmo", hint: "'Hijo de algo'. Nobleza menor castellana", difficulty: 2 },
+      { id: "ar36", word: "menguado", synonym: "cobarde", category: "Arcaísmo", hint: "También: necio, falto de juicio", difficulty: 3 },
+      { id: "ar37", word: "adobar", synonym: "preparar", category: "Arcaísmo", hint: "Arreglar, componer. Don Quijote 'adobó' su armadura", difficulty: 3 },
+      { id: "ar38", word: "follón", synonym: "cobarde", category: "Arcaísmo", hint: "Ruin, vil. Insulto caballeresco", difficulty: 3 },
+      { id: "ar39", word: "sandio", synonym: "necio", category: "Arcaísmo", hint: "Persona simple o tonta", difficulty: 3 },
+      { id: "ar40", word: "fermosura", synonym: "hermosura", category: "Arcaísmo", hint: "Belleza. Dulcinea era de gran fermosura", difficulty: 2 },
+
+      // ==================== CULTISMOS (~25) ====================
+      { id: "c01", word: "magnánimo", synonym: "generoso", category: "Cultismo", hint: "De gran ánimo, que perdona ofensas", difficulty: 2 },
+      { id: "c02", word: "verosímil", synonym: "creíble", category: "Cultismo", hint: "Que parece verdadero", difficulty: 2 },
+      { id: "c03", word: "conspicuo", synonym: "ilustre", category: "Cultismo", hint: "Sobresaliente, visible", difficulty: 3 },
+      { id: "c04", word: "eximio", synonym: "excelente", category: "Cultismo", hint: "Muy distinguido en su género", difficulty: 3 },
+      { id: "c05", word: "excelso", synonym: "sublime", category: "Cultismo", hint: "De máxima elevación", difficulty: 2 },
+      { id: "c06", word: "ínclito", synonym: "famoso", category: "Cultismo", hint: "Ilustre, célebre por sus méritos", difficulty: 3 },
+      { id: "c07", word: "nefando", synonym: "abominable", category: "Cultismo", hint: "Tan malo que no puede nombrarse", difficulty: 3 },
+      { id: "c08", word: "preclaro", synonym: "esclarecido", category: "Cultismo", hint: "Muy ilustre, insigne", difficulty: 3 },
+      { id: "c09", word: "recóndito", synonym: "oculto", category: "Cultismo", hint: "Muy escondido, reservado", difficulty: 2 },
+      { id: "c10", word: "ubérrimo", synonym: "abundantísimo", category: "Cultismo", hint: "Superlativo culto de 'fértil'", difficulty: 3 },
+      { id: "c11", word: "sempiterno", synonym: "eterno", category: "Cultismo", hint: "Que dura por siempre", difficulty: 2 },
+      { id: "c12", word: "ignoto", synonym: "desconocido", category: "Cultismo", hint: "No descubierto ni conocido", difficulty: 2 },
+      { id: "c13", word: "probo", synonym: "íntegro", category: "Cultismo", hint: "De gran honradez", difficulty: 3 },
+      { id: "c14", word: "feraz", synonym: "fértil", category: "Cultismo", hint: "Tierra que produce mucho", difficulty: 3 },
+      { id: "c15", word: "ubicuo", synonym: "omnipresente", category: "Cultismo", hint: "Que está en todas partes", difficulty: 2 },
+      { id: "c16", word: "inefable", synonym: "indescriptible", category: "Cultismo", hint: "Que no puede expresarse con palabras", difficulty: 2 },
+      { id: "c17", word: "pertinaz", synonym: "tenaz", category: "Cultismo", hint: "Obstinado, que persiste", difficulty: 2 },
+      { id: "c18", word: "oprobio", synonym: "deshonra", category: "Cultismo", hint: "Vergüenza pública", difficulty: 3 },
+      { id: "c19", word: "abyecto", synonym: "despreciable", category: "Cultismo", hint: "Vil, de bajeza extrema", difficulty: 3 },
+      { id: "c20", word: "acérrimo", synonym: "fervoroso", category: "Cultismo", hint: "Superlativo culto: muy fuerte, decidido", difficulty: 2 },
+      { id: "c21", word: "longevo", synonym: "anciano", category: "Cultismo", hint: "De larga vida", difficulty: 2 },
+      { id: "c22", word: "incólume", synonym: "ileso", category: "Cultismo", hint: "Sin daño, sano y salvo", difficulty: 3 },
+      { id: "c23", word: "desidia", synonym: "pereza", category: "Cultismo", hint: "Negligencia, falta de interés", difficulty: 2 },
+      { id: "c24", word: "epítome", synonym: "resumen", category: "Cultismo", hint: "Compendio de una obra extensa", difficulty: 3 },
+      { id: "c25", word: "dilapidar", synonym: "malgastar", category: "Cultismo", hint: "Gastar sin medida", difficulty: 2 },
+
+      // ==================== EDUCACIÓN / LITERARIO (~25) ====================
+      { id: "e01", word: "pedagogo", synonym: "maestro", category: "Educación", hint: "Persona que se dedica a la enseñanza", difficulty: 1 },
+      { id: "e02", word: "didáctica", synonym: "enseñanza", category: "Educación", hint: "Arte de enseñar", difficulty: 1 },
+      { id: "e03", word: "currículo", synonym: "plan de estudios", category: "Educación", hint: "Conjunto de materias de un curso", difficulty: 1 },
+      { id: "e04", word: "símil", synonym: "comparación", category: "Educación", hint: "Figura retórica: 'como', 'igual que'", difficulty: 2 },
+      { id: "e05", word: "metáfora", synonym: "imagen", category: "Educación", hint: "Identificación entre dos términos: 'tus ojos son soles'", difficulty: 1 },
+      { id: "e06", word: "hipérbole", synonym: "exageración", category: "Educación", hint: "Figura retórica: 'te lo he dicho mil veces'", difficulty: 1 },
+      { id: "e07", word: "elipsis", synonym: "omisión", category: "Educación", hint: "Supresión de un elemento de la frase", difficulty: 2 },
+      { id: "e08", word: "antítesis", synonym: "contraste", category: "Educación", hint: "Contraposición de ideas: 'fuego y hielo'", difficulty: 2 },
+      { id: "e09", word: "etopeya", synonym: "retrato moral", category: "Educación", hint: "Descripción del carácter de una persona", difficulty: 3 },
+      { id: "e10", word: "prosopografía", synonym: "retrato físico", category: "Educación", hint: "Descripción del aspecto exterior", difficulty: 3 },
+      { id: "e11", word: "alegoría", synonym: "simbolismo", category: "Educación", hint: "Metáfora extendida a todo un texto", difficulty: 2 },
+      { id: "e12", word: "parábola", synonym: "enseñanza moral", category: "Educación", hint: "Relato breve con moraleja", difficulty: 2 },
+      { id: "e13", word: "apólogo", synonym: "fábula", category: "Educación", hint: "Narración con animales que enseña una lección", difficulty: 3 },
+      { id: "e14", word: "soliloquio", synonym: "monólogo", category: "Educación", hint: "Hablar consigo mismo en voz alta", difficulty: 2 },
+      { id: "e15", word: "pleonasmo", synonym: "redundancia", category: "Educación", hint: "Repetición innecesaria: 'subir arriba'", difficulty: 2 },
+      { id: "e16", word: "lítote", synonym: "atenuación", category: "Educación", hint: "Negar lo contrario: 'no es malo' = es bueno", difficulty: 3 },
+      { id: "e17", word: "metonimia", synonym: "sustitución", category: "Educación", hint: "Nombrar algo por su relación: 'tomar una copa'", difficulty: 2 },
+      { id: "e18", word: "sinécdoque", synonym: "parte por todo", category: "Educación", hint: "Un tipo de metonimia: 'tiene quince primaveras'", difficulty: 3 },
+      { id: "e19", word: "anáfora", synonym: "repetición inicial", category: "Educación", hint: "Repetir una palabra al inicio de varios versos", difficulty: 2 },
+      { id: "e20", word: "epíteto", synonym: "adjetivo ornamental", category: "Educación", hint: "'La blanca nieve' — adjetivo que no añade información", difficulty: 2 },
+      { id: "e21", word: "estrofa", synonym: "grupo de versos", category: "Educación", hint: "Conjunto de versos que forman una unidad", difficulty: 1 },
+      { id: "e22", word: "rima", synonym: "concordancia sonora", category: "Educación", hint: "Coincidencia de sonidos al final de los versos", difficulty: 1 },
+      { id: "e23", word: "prosa", synonym: "texto sin verso", category: "Educación", hint: "Forma natural del lenguaje, sin rima ni medida", difficulty: 1 },
+      { id: "e24", word: "aliteración", synonym: "repetición de sonidos", category: "Educación", hint: "'Con el ala aleve del leve abanico'", difficulty: 2 },
+      { id: "e25", word: "oxímoron", synonym: "contradicción", category: "Educación", hint: "Unir opuestos: 'silencio atronador'", difficulty: 2 },
+    ];
+
+    // Extraer categorías únicas
+    const CATEGORIES = [...new Set(SYNONYMS.map(s => s.category))];
+
+    // ===================================================================
+    // ALMACENAMIENTO (localStorage)
+    // ===================================================================
+    const STORAGE_PREFIX = 'sinoniza_';
+
+    function loadProgress() {
+      try {
+        const data = localStorage.getItem(STORAGE_PREFIX + 'progress');
+        return data ? JSON.parse(data) : {};
+      } catch { return {}; }
+    }
+
+    function saveProgress(progress) {
+      localStorage.setItem(STORAGE_PREFIX + 'progress', JSON.stringify(progress));
+    }
+
+    function loadSettings() {
+      try {
+        const data = localStorage.getItem(STORAGE_PREFIX + 'settings');
+        return data ? JSON.parse(data) : { categories: CATEGORIES.slice() };
+      } catch { return { categories: CATEGORIES.slice() }; }
+    }
+
+    function saveSettings(settings) {
+      localStorage.setItem(STORAGE_PREFIX + 'settings', JSON.stringify(settings));
+    }
+
+    function clearAllData() {
+      localStorage.removeItem(STORAGE_PREFIX + 'progress');
+      localStorage.removeItem(STORAGE_PREFIX + 'settings');
+    }
+
+    // ===================================================================
+    // ALGORITMO DE REPETICIÓN ESPACIADA (LEITNER)
+    // ===================================================================
+    const BOX_WEIGHTS = { 0: 20, 1: 16, 2: 8, 3: 4, 4: 2, 5: 1 };
+    // box 0 = nunca vista, boxes 1-5 = cajas Leitner
+
+    function getCardBox(cardId, progress) {
+      return progress[cardId] ? progress[cardId].box : 0;
+    }
+
+    function selectNextCard(allWords, progress, selectedCategories, lastCardId) {
+      const filtered = allWords.filter(w => selectedCategories.includes(w.category));
+      if (filtered.length === 0) return null;
+      if (filtered.length === 1) return filtered[0];
+
+      // Calcular pesos
+      let totalWeight = 0;
+      const weights = filtered.map(word => {
+        if (word.id === lastCardId) return 0; // Evitar repetir
+        const box = getCardBox(word.id, progress);
+        const weight = BOX_WEIGHTS[box] || 1;
+        totalWeight += weight;
+        return weight;
+      });
+
+      if (totalWeight === 0) {
+        // Solo queda la última carta, devolverla
+        return filtered.find(w => w.id === lastCardId) || filtered[0];
+      }
+
+      // Selección ponderada
+      let random = Math.random() * totalWeight;
+      for (let i = 0; i < filtered.length; i++) {
+        random -= weights[i];
+        if (random <= 0) return filtered[i];
+      }
+      return filtered[filtered.length - 1];
+    }
+
+    function handleCorrect(cardId, progress) {
+      const current = progress[cardId] || { box: 0, correct: 0, incorrect: 0 };
+      return {
+        ...progress,
+        [cardId]: {
+          box: Math.min(current.box === 0 ? 1 : current.box + 1, 5),
+          correct: (current.correct || 0) + 1,
+          incorrect: current.incorrect || 0,
+          lastSeen: Date.now()
+        }
+      };
+    }
+
+    function handleIncorrect(cardId, progress) {
+      const current = progress[cardId] || { box: 0, correct: 0, incorrect: 0 };
+      return {
+        ...progress,
+        [cardId]: {
+          box: 1,
+          correct: current.correct || 0,
+          incorrect: (current.incorrect || 0) + 1,
+          lastSeen: Date.now()
+        }
+      };
+    }
+
+    function getGlobalStats(progress) {
+      const entries = Object.values(progress);
+      if (entries.length === 0) return { studied: 0, accuracy: 0, mastered: 0 };
+      const totalCorrect = entries.reduce((sum, e) => sum + (e.correct || 0), 0);
+      const totalIncorrect = entries.reduce((sum, e) => sum + (e.incorrect || 0), 0);
+      const total = totalCorrect + totalIncorrect;
+      const mastered = entries.filter(e => e.box >= 5).length;
+      return {
+        studied: entries.length,
+        accuracy: total > 0 ? Math.round((totalCorrect / total) * 100) : 0,
+        mastered
+      };
+    }
+
+    // ===================================================================
+    // APLICACIÓN
+    // ===================================================================
+    const app = document.getElementById('app');
+
+    let state = {
+      screen: 'start', // start | playing | summary
+      progress: loadProgress(),
+      settings: loadSettings(),
+      currentCard: null,
+      lastCardId: null,
+      isFlipped: false,
+      cardAnimating: false,
+      sessionStats: { total: 0, correct: 0, incorrect: 0, streak: 0, bestStreak: 0, wrongCards: [] },
+      showResetConfirm: false
+    };
+
+    function setState(updates) {
+      Object.assign(state, updates);
+      render();
+    }
+
+    function getDifficultyStars(d) {
+      if (d === 1) return '⭐';
+      if (d === 2) return '⭐⭐';
+      return '⭐⭐⭐';
+    }
+
+    function toggleCategory(cat) {
+      const cats = state.settings.categories.slice();
+      const idx = cats.indexOf(cat);
+      if (idx >= 0) {
+        if (cats.length === 1) return; // Al menos una categoría
+        cats.splice(idx, 1);
+      } else {
+        cats.push(cat);
+      }
+      const newSettings = { ...state.settings, categories: cats };
+      saveSettings(newSettings);
+      setState({ settings: newSettings });
+    }
+
+    function startGame() {
+      const card = selectNextCard(SYNONYMS, state.progress, state.settings.categories, null);
+      if (!card) return;
+      setState({
+        screen: 'playing',
+        currentCard: card,
+        lastCardId: null,
+        isFlipped: false,
+        cardAnimating: true,
+        sessionStats: { total: 0, correct: 0, incorrect: 0, streak: 0, bestStreak: 0, wrongCards: [] }
+      });
+      setTimeout(() => setState({ cardAnimating: false }), 350);
+    }
+
+    function flipCard() {
+      if (state.isFlipped) return;
+      setState({ isFlipped: true });
+    }
+
+    function answerCorrect() {
+      if (!state.currentCard) return;
+      const newProgress = handleCorrect(state.currentCard.id, state.progress);
+      saveProgress(newProgress);
+      const newStreak = state.sessionStats.streak + 1;
+      const stats = {
+        ...state.sessionStats,
+        total: state.sessionStats.total + 1,
+        correct: state.sessionStats.correct + 1,
+        streak: newStreak,
+        bestStreak: Math.max(newStreak, state.sessionStats.bestStreak)
+      };
+      nextCard(newProgress, stats);
+    }
+
+    function answerIncorrect() {
+      if (!state.currentCard) return;
+      const newProgress = handleIncorrect(state.currentCard.id, state.progress);
+      saveProgress(newProgress);
+      const stats = {
+        ...state.sessionStats,
+        total: state.sessionStats.total + 1,
+        incorrect: state.sessionStats.incorrect + 1,
+        streak: 0,
+        wrongCards: [...state.sessionStats.wrongCards, state.currentCard]
+      };
+      nextCard(newProgress, stats);
+    }
+
+    function nextCard(newProgress, stats) {
+      const card = selectNextCard(SYNONYMS, newProgress, state.settings.categories, state.currentCard.id);
+      setState({
+        progress: newProgress,
+        sessionStats: stats,
+        currentCard: card,
+        lastCardId: state.currentCard.id,
+        isFlipped: false,
+        cardAnimating: true
+      });
+      setTimeout(() => setState({ cardAnimating: false }), 350);
+    }
+
+    function endSession() {
+      setState({ screen: 'summary' });
+    }
+
+    function goHome() {
+      setState({ screen: 'start', showResetConfirm: false });
+    }
+
+    function resetProgress() {
+      clearAllData();
+      setState({
+        progress: {},
+        settings: { categories: CATEGORIES.slice() },
+        showResetConfirm: false
+      });
+    }
+
+    // ===================================================================
+    // RENDERIZADO
+    // ===================================================================
+    function render() {
+      if (state.screen === 'start') renderStart();
+      else if (state.screen === 'playing') renderGame();
+      else if (state.screen === 'summary') renderSummary();
+    }
+
+    function renderStart() {
+      const stats = getGlobalStats(state.progress);
+      const totalWords = SYNONYMS.length;
+
+      app.innerHTML = `
+        <div class="start-screen">
+          <div class="logo">Sinoniza</div>
+          <div class="subtitle">Flashcards de sinónimos para oposiciones</div>
+
+          ${stats.studied > 0 ? `
+            <div class="stats-box">
+              <div class="stat-item">
+                <div class="stat-value">${stats.studied}</div>
+                <div class="stat-label">Estudiadas</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-value">${stats.accuracy}%</div>
+                <div class="stat-label">Aciertos</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-value">${stats.mastered}</div>
+                <div class="stat-label">Dominadas</div>
+              </div>
+            </div>
+          ` : `
+            <div class="stats-box">
+              <div class="stat-item" style="grid-column: 1 / -1; text-align: center;">
+                <div class="stat-value">${totalWords}</div>
+                <div class="stat-label">Palabras por aprender</div>
+              </div>
+            </div>
+          `}
+
+          <div class="category-section">
+            <div class="category-title">Categorías</div>
+            <div class="category-chips" id="chips"></div>
+          </div>
+
+          <button class="btn btn-primary" id="btn-start">Empezar</button>
+
+          ${stats.studied > 0 ? `
+            <button class="btn btn-ghost" id="btn-reset">Reiniciar progreso</button>
+          ` : ''}
+
+          ${state.showResetConfirm ? `
+            <div class="reset-confirm">
+              <p>Se borrará todo tu progreso. ¿Estás seguro?</p>
+              <div class="reset-confirm-buttons">
+                <button class="btn btn-danger btn-sm" id="btn-confirm-reset">Sí, borrar</button>
+                <button class="btn btn-ghost btn-sm" id="btn-cancel-reset">Cancelar</button>
+              </div>
+            </div>
+          ` : ''}
+        </div>
+      `;
+
+      // Chips de categorías
+      const chipsContainer = document.getElementById('chips');
+      CATEGORIES.forEach(cat => {
+        const count = SYNONYMS.filter(s => s.category === cat).length;
+        const isActive = state.settings.categories.includes(cat);
+        const chip = document.createElement('button');
+        chip.className = 'chip' + (isActive ? ' active' : '');
+        chip.innerHTML = `${cat}<span class="chip-count">${count}</span>`;
+        chip.addEventListener('click', () => toggleCategory(cat));
+        chipsContainer.appendChild(chip);
+      });
+
+      document.getElementById('btn-start').addEventListener('click', startGame);
+
+      const resetBtn = document.getElementById('btn-reset');
+      if (resetBtn) {
+        resetBtn.addEventListener('click', () => setState({ showResetConfirm: true }));
+      }
+
+      const confirmResetBtn = document.getElementById('btn-confirm-reset');
+      if (confirmResetBtn) {
+        confirmResetBtn.addEventListener('click', resetProgress);
+      }
+
+      const cancelResetBtn = document.getElementById('btn-cancel-reset');
+      if (cancelResetBtn) {
+        cancelResetBtn.addEventListener('click', () => setState({ showResetConfirm: false }));
+      }
+    }
+
+    function renderGame() {
+      const card = state.currentCard;
+      if (!card) return;
+
+      const box = getCardBox(card.id, state.progress);
+      const { total, correct, incorrect, streak } = state.sessionStats;
+      const accuracy = total > 0 ? Math.round((correct / total) * 100) : 100;
+      const accClass = accuracy >= 70 ? 'good' : accuracy >= 40 ? 'mid' : 'bad';
+
+      app.innerHTML = `
+        <div class="game-screen">
+          <div class="game-header">
+            <div class="progress-info">
+              <div class="progress-stat"><span>${total}</span> tarjetas</div>
+              ${streak > 2 ? `<div class="progress-stat" style="color: var(--success);">🔥 ${streak}</div>` : ''}
+            </div>
+            <div style="display: flex; align-items: center; gap: 12px;">
+              ${total > 0 ? `<div class="accuracy ${accClass}">${accuracy}%</div>` : ''}
+              <button class="btn btn-ghost" id="btn-end">Terminar</button>
+            </div>
+          </div>
+
+          <div class="card-area">
+            <div class="card-container">
+              <div class="card ${state.isFlipped ? 'flipped' : ''} ${state.cardAnimating ? 'card-enter' : ''}" id="the-card">
+                <div class="card-face card-front">
+                  <div class="card-category">${card.category}</div>
+                  <div class="card-difficulty">${getDifficultyStars(card.difficulty)}</div>
+                  <div class="card-word">${card.word}</div>
+                  <div class="card-box-indicator">
+                    ${[1,2,3,4,5].map(i => `<div class="box-dot ${i <= box ? 'filled' : ''}"></div>`).join('')}
+                  </div>
+                </div>
+                <div class="card-face card-back">
+                  <div class="card-category">${card.category}</div>
+                  <div class="card-word">${card.synonym}</div>
+                  ${card.hint ? `<div class="card-hint">${card.hint}</div>` : ''}
+                  <div class="card-box-indicator">
+                    ${[1,2,3,4,5].map(i => `<div class="box-dot ${i <= box ? 'filled' : ''}"></div>`).join('')}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="action-area">
+              ${!state.isFlipped ? `
+                <button class="btn btn-flip" id="btn-flip">Dar la vuelta</button>
+              ` : `
+                <div class="result-buttons">
+                  <button class="btn btn-danger" id="btn-wrong">✗ Error</button>
+                  <button class="btn btn-success" id="btn-right">✓ Acierto</button>
+                </div>
+              `}
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Event listeners
+      document.getElementById('btn-end').addEventListener('click', endSession);
+
+      const theCard = document.getElementById('the-card');
+      theCard.addEventListener('click', flipCard);
+
+      const flipBtn = document.getElementById('btn-flip');
+      if (flipBtn) flipBtn.addEventListener('click', flipCard);
+
+      const rightBtn = document.getElementById('btn-right');
+      if (rightBtn) rightBtn.addEventListener('click', answerCorrect);
+
+      const wrongBtn = document.getElementById('btn-wrong');
+      if (wrongBtn) wrongBtn.addEventListener('click', answerIncorrect);
+    }
+
+    function renderSummary() {
+      const { total, correct, incorrect, bestStreak, wrongCards } = state.sessionStats;
+      const accuracy = total > 0 ? Math.round((correct / total) * 100) : 0;
+
+      // Eliminar duplicados de wrongCards
+      const uniqueWrong = wrongCards.filter((card, idx, arr) =>
+        arr.findIndex(c => c.id === card.id) === idx
+      );
+
+      app.innerHTML = `
+        <div class="summary-screen">
+          <div class="summary-title">Sesión completada</div>
+
+          <div class="summary-stats">
+            <div class="summary-stat">
+              <div class="summary-stat-value total">${total}</div>
+              <div class="summary-stat-label">Tarjetas</div>
+            </div>
+            <div class="summary-stat">
+              <div class="summary-stat-value" style="color: var(--primary-light);">${accuracy}%</div>
+              <div class="summary-stat-label">Aciertos</div>
+            </div>
+            <div class="summary-stat">
+              <div class="summary-stat-value correct">${correct}</div>
+              <div class="summary-stat-label">Correctas</div>
+            </div>
+            <div class="summary-stat">
+              <div class="summary-stat-value incorrect">${incorrect}</div>
+              <div class="summary-stat-label">Incorrectas</div>
+            </div>
+          </div>
+
+          ${bestStreak > 2 ? `
+            <div style="text-align: center; color: var(--text-secondary); font-size: 15px;">
+              🔥 Mejor racha: <strong style="color: var(--success);">${bestStreak}</strong> aciertos seguidos
+            </div>
+          ` : ''}
+
+          ${uniqueWrong.length > 0 ? `
+            <div class="wrong-words-section">
+              <div class="wrong-words-title">Palabras para repasar (${uniqueWrong.length})</div>
+              ${uniqueWrong.map(card => `
+                <div class="wrong-word-item">
+                  <span class="word">${card.word}</span>
+                  <span class="arrow">→</span>
+                  <span class="synonym">${card.synonym}</span>
+                </div>
+              `).join('')}
+            </div>
+          ` : `
+            <div style="text-align: center; color: var(--success); font-size: 16px; padding: 16px 0;">
+              ¡Perfecto! No has fallado ninguna 🎯
+            </div>
+          `}
+
+          <div class="summary-buttons">
+            <button class="btn btn-primary" id="btn-again">Otra ronda</button>
+            <button class="btn btn-secondary" id="btn-home">Volver al inicio</button>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('btn-again').addEventListener('click', startGame);
+      document.getElementById('btn-home').addEventListener('click', goHome);
+    }
+
+    // ===================================================================
+    // INICIAR
+    // ===================================================================
+    render();
+  </script>
+</body>
+</html>
