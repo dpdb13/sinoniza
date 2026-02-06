@@ -231,6 +231,23 @@
     }
     .btn-ghost:hover { color: var(--text); background: var(--surface); }
 
+    .btn-end-session {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-family: inherit;
+      white-space: nowrap;
+    }
+    .btn-end-session:active {
+      background: var(--surface-hover);
+      color: var(--text);
+    }
+
     .btn-flip {
       background: var(--surface-elevated);
       color: var(--primary-light);
@@ -819,23 +836,79 @@
       margin-top: 4px;
     }
 
-    .wrong-words-section {
+    .wrong-words-btn {
       width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--danger);
+      border-radius: var(--radius-md);
+      padding: 14px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      font-family: inherit;
+      color: var(--danger);
+      font-size: 15px;
+      font-weight: 600;
+      transition: background 0.15s ease;
+    }
+
+    .wrong-words-btn:active {
+      background: var(--surface-hover);
+    }
+
+    .wrong-words-btn-arrow {
+      font-size: 18px;
+      color: var(--text-muted);
+    }
+
+    /* Vista completa de palabras falladas */
+    .wrong-words-view {
+      min-height: 100dvh;
+      width: 100%;
+      max-width: 480px;
+      padding: 24px;
+      animation: fadeIn 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .wrong-words-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 4px;
+    }
+
+    .wrong-words-back {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      padding: 8px 14px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      flex-shrink: 0;
+    }
+
+    .wrong-words-back:active {
+      background: var(--surface-hover);
     }
 
     .wrong-words-title {
-      font-size: 16px;
-      font-weight: 600;
+      font-size: 18px;
+      font-weight: 700;
       color: var(--danger);
-      margin-bottom: 12px;
     }
 
     .wrong-word-item {
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--radius-sm);
-      padding: 12px 16px;
-      margin-bottom: 8px;
+      padding: 14px 16px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -2006,7 +2079,7 @@
             <div style="display: flex; align-items: center; gap: 10px;">
               <div class="xp-display">${state.xp} XP</div>
               ${total > 0 ? `<div class="accuracy ${accClass}">${accuracy}%</div>` : ''}
-              <button class="btn btn-ghost" id="btn-end">Terminar</button>
+              <button class="btn-end-session" id="btn-end">Terminar</button>
             </div>
           </div>
 
@@ -2131,16 +2204,10 @@
           ` : ''}
 
           ${uniqueWrong.length > 0 ? `
-            <div class="wrong-words-section">
-              <div class="wrong-words-title">Palabras para repasar (${uniqueWrong.length})</div>
-              ${uniqueWrong.map(card => `
-                <div class="wrong-word-item">
-                  <span class="word">${card.word}</span>
-                  <span class="arrow">→</span>
-                  <span class="synonym">${card.synonym}</span>
-                </div>
-              `).join('')}
-            </div>
+            <button class="wrong-words-btn" id="btn-wrong-words">
+              <span>Palabras para repasar (${uniqueWrong.length})</span>
+              <span class="wrong-words-btn-arrow">›</span>
+            </button>
           ` : `
             <div style="text-align: center; color: var(--success); font-size: 16px; padding: 16px 0;">
               ¡Perfecto! No has fallado ninguna 🎯
@@ -2156,6 +2223,32 @@
 
       document.getElementById('btn-again').addEventListener('click', startGame);
       document.getElementById('btn-home').addEventListener('click', goHome);
+
+      const wrongWordsBtn = document.getElementById('btn-wrong-words');
+      if (wrongWordsBtn) {
+        wrongWordsBtn.addEventListener('click', () => showWrongWords(uniqueWrong));
+      }
+    }
+
+    function showWrongWords(words) {
+      app.innerHTML = `
+        <div class="wrong-words-view">
+          <div class="wrong-words-header">
+            <button class="wrong-words-back" id="btn-back-summary">← Volver</button>
+            <div class="wrong-words-title">Para repasar (${words.length})</div>
+          </div>
+          ${words.map(card => `
+            <div class="wrong-word-item">
+              <span class="word">${card.word}</span>
+              <span class="arrow">→</span>
+              <span class="synonym">${card.synonym}</span>
+            </div>
+          `).join('')}
+        </div>
+      `;
+      document.getElementById('btn-back-summary').addEventListener('click', () => {
+        setState({ screen: 'summary' });
+      });
     }
 
     // ===================================================================
