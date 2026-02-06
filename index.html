@@ -2244,6 +2244,7 @@
 
           <div class="summary-buttons">
             <button class="btn btn-primary" id="btn-again">Continuar</button>
+            ${uniqueWrong.length > 0 ? `<button class="btn btn-fails" id="btn-play-session-fails">Jugar fallos</button>` : ''}
             <button class="btn btn-secondary" id="btn-home">Volver al inicio</button>
           </div>
         </div>
@@ -2251,6 +2252,11 @@
 
       document.getElementById('btn-again').addEventListener('click', () => startGame(false));
       document.getElementById('btn-home').addEventListener('click', () => goHome());
+
+      const playSessionFails = document.getElementById('btn-play-session-fails');
+      if (playSessionFails) {
+        playSessionFails.addEventListener('click', () => startGame(true));
+      }
 
       const wrongWordsBtn = document.getElementById('btn-wrong-words');
       if (wrongWordsBtn) {
@@ -2272,18 +2278,13 @@
               <span class="synonym">${card.synonyms.join(', ')}</span>
             </div>
           `).join('')}
-          ${backTo === 'start' ? `
-            <button class="btn btn-primary" id="btn-play-fails" style="margin-top: 8px;">Jugar</button>
-          ` : ''}
+          <button class="btn btn-primary" id="btn-play-fails" style="margin-top: 8px;">Jugar</button>
         </div>
       `;
       document.getElementById('btn-back').addEventListener('click', () => {
         setState({ screen: backTo === 'start' ? 'start' : 'summary' });
       });
-      const playBtn = document.getElementById('btn-play-fails');
-      if (playBtn) {
-        playBtn.addEventListener('click', () => startGame(true));
-      }
+      document.getElementById('btn-play-fails').addEventListener('click', () => startGame(true));
     }
 
     // ===================================================================
