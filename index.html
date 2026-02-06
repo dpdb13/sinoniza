@@ -343,15 +343,25 @@
       font-weight: 700;
       text-align: center;
       line-height: 1.15;
-      word-break: break-word;
       max-width: 100%;
       padding: 0 4px;
     }
 
-    .card-word.size-xl { font-size: 38px; }
-    .card-word.size-lg { font-size: 32px; }
-    .card-word.size-md { font-size: 26px; }
-    .card-word.size-sm { font-size: 22px; }
+    /* Palabras sueltas: nunca partir */
+    .card-word.single-word {
+      white-space: nowrap;
+    }
+
+    /* Frases (varias palabras): permitir salto entre palabras */
+    .card-word.multi-word {
+      word-break: normal;
+      overflow-wrap: normal;
+    }
+
+    .card-word.size-xl { font-size: min(38px, 9vw); }
+    .card-word.size-lg { font-size: min(30px, 7.5vw); }
+    .card-word.size-md { font-size: min(24px, 6vw); }
+    .card-word.size-sm { font-size: min(20px, 5vw); }
 
     .card-back .card-word {
       color: var(--primary-light);
@@ -1182,13 +1192,17 @@
       return '⭐⭐⭐';
     }
 
-    // Auto-tamaño: palabras largas se muestran más pequeñas
-    function getWordSizeClass(text) {
+    // Auto-tamaño y detección de palabra suelta vs frase
+    function getWordClasses(text) {
       const len = text.length;
-      if (len <= 10) return 'size-xl';
-      if (len <= 16) return 'size-lg';
-      if (len <= 24) return 'size-md';
-      return 'size-sm';
+      const isMulti = text.includes(' ');
+      const wordClass = isMulti ? 'multi-word' : 'single-word';
+      let sizeClass;
+      if (len <= 9) sizeClass = 'size-xl';
+      else if (len <= 14) sizeClass = 'size-lg';
+      else if (len <= 20) sizeClass = 'size-md';
+      else sizeClass = 'size-sm';
+      return `${wordClass} ${sizeClass}`;
     }
 
     function toggleCategory(cat) {
@@ -1406,14 +1420,14 @@
                 <div class="card-face card-front">
                   <div class="card-category">${card.category}</div>
                   <div class="card-difficulty">${getDifficultyStars(card.difficulty)}</div>
-                  <div class="card-word ${getWordSizeClass(card.word)}">${card.word}</div>
+                  <div class="card-word ${getWordClasses(card.word)}">${card.word}</div>
                   <div class="card-box-indicator">
                     ${[1,2,3,4,5].map(i => `<div class="box-dot ${i <= box ? 'filled' : ''}"></div>`).join('')}
                   </div>
                 </div>
                 <div class="card-face card-back">
                   <div class="card-category">${card.category}</div>
-                  <div class="card-word ${getWordSizeClass(card.synonym)}">${card.synonym}</div>
+                  <div class="card-word ${getWordClasses(card.synonym)}">${card.synonym}</div>
                   ${card.hint ? `<div class="card-hint">${card.hint}</div>` : ''}
                   <div class="card-box-indicator">
                     ${[1,2,3,4,5].map(i => `<div class="box-dot ${i <= box ? 'filled' : ''}"></div>`).join('')}
