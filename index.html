@@ -132,19 +132,21 @@
       border-radius: var(--radius-sm);
       padding: 8px 14px;
       font-size: 13px;
-      color: var(--text-secondary);
+      color: var(--text-muted);
       cursor: pointer;
-      transition: all 150ms ease;
+      transition: background 150ms ease, border-color 150ms ease, color 150ms ease, opacity 150ms ease;
       font-family: inherit;
       user-select: none;
+      opacity: 0.45;
     }
 
-    .chip:hover { background: var(--surface-hover); }
+    .chip:active { transform: scale(0.96); }
 
     .chip.active {
       background: var(--primary-pale);
       border-color: var(--primary);
       color: var(--primary-light);
+      opacity: 1;
     }
 
     .chip .chip-count {
@@ -162,7 +164,7 @@
       border-radius: var(--radius-md);
       padding: 16px 32px;
       cursor: pointer;
-      transition: all 150ms ease;
+      transition: background 150ms ease, transform 150ms ease;
       min-height: 52px;
       display: flex;
       align-items: center;
@@ -192,16 +194,9 @@
       border: 1px solid var(--danger);
       width: 100%;
       font-size: 16px;
-      flex-direction: column;
-      gap: 2px;
     }
     .btn-fails:hover { background: rgba(239, 68, 68, 0.1); }
     .btn-fails:active { transform: scale(0.98); }
-    .btn-fails .fail-count {
-      font-size: 12px;
-      opacity: 0.7;
-      font-weight: 400;
-    }
     .btn-fails:disabled {
       opacity: 0.3;
       cursor: not-allowed;
@@ -1707,15 +1702,17 @@
     }
 
     function toggleCategory(cat) {
-      const cats = state.settings.categories.slice();
-      const idx = cats.indexOf(cat);
-      if (idx >= 0) {
-        if (cats.length === 1) return; // Al menos una categoría
-        cats.splice(idx, 1);
+      const cats = state.settings.categories;
+      const onlyThisSelected = cats.length === 1 && cats[0] === cat;
+      let newCats;
+      if (onlyThisSelected) {
+        // Si solo esta está seleccionada, seleccionar todas
+        newCats = CATEGORIES.slice();
       } else {
-        cats.push(cat);
+        // Seleccionar solo esta
+        newCats = [cat];
       }
-      const newSettings = { ...state.settings, categories: cats };
+      const newSettings = { ...state.settings, categories: newCats };
       saveSettings(newSettings);
       setState({ settings: newSettings });
     }
@@ -2030,15 +2027,16 @@
 
       if (hasProgress) {
         startBtns.innerHTML = `
-          <button class="btn btn-primary" id="btn-start">Completo</button>
+          <button class="btn btn-primary" id="btn-start">Jugar</button>
           <button class="btn btn-fails" id="btn-fails" ${failedWords.length === 0 ? 'disabled' : ''}>
             Fallos
-            <span class="fail-count">${failedWords.length} palabras</span>
           </button>
         `;
-        document.getElementById('btn-fails').addEventListener('click', () => startGame(true));
+        document.getElementById('btn-fails').addEventListener('click', () => {
+          showWrongWords(failedWords, 'start');
+        });
       } else {
-        startBtns.innerHTML = `<button class="btn btn-primary" id="btn-start">Empezar</button>`;
+        startBtns.innerHTML = `<button class="btn btn-primary" id="btn-start">Jugar</button>`;
       }
       document.getElementById('btn-start').addEventListener('click', () => startGame(false));
 
@@ -2226,15 +2224,15 @@
 
       const wrongWordsBtn = document.getElementById('btn-wrong-words');
       if (wrongWordsBtn) {
-        wrongWordsBtn.addEventListener('click', () => showWrongWords(uniqueWrong));
+        wrongWordsBtn.addEventListener('click', () => showWrongWords(uniqueWrong, 'summary'));
       }
     }
 
-    function showWrongWords(words) {
+    function showWrongWords(words, backTo) {
       app.innerHTML = `
         <div class="wrong-words-view">
           <div class="wrong-words-header">
-            <button class="wrong-words-back" id="btn-back-summary">← Volver</button>
+            <button class="wrong-words-back" id="btn-back">← Volver</button>
             <div class="wrong-words-title">Para repasar (${words.length})</div>
           </div>
           ${words.map(card => `
@@ -2244,11 +2242,18 @@
               <span class="synonym">${card.synonym}</span>
             </div>
           `).join('')}
+          ${backTo === 'start' ? `
+            <button class="btn btn-primary" id="btn-play-fails" style="margin-top: 8px;">Jugar</button>
+          ` : ''}
         </div>
       `;
-      document.getElementById('btn-back-summary').addEventListener('click', () => {
-        setState({ screen: 'summary' });
+      document.getElementById('btn-back').addEventListener('click', () => {
+        setState({ screen: backTo === 'start' ? 'start' : 'summary' });
       });
+      const playBtn = document.getElementById('btn-play-fails');
+      if (playBtn) {
+        playBtn.addEventListener('click', () => startGame(true));
+      }
     }
 
     // ===================================================================
