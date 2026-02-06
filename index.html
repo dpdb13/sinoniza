@@ -598,10 +598,12 @@
       color: var(--text-muted);
     }
 
-    .levels-info-check {
-      color: var(--primary);
-      font-size: 16px;
+    .levels-info-current-xp {
+      color: var(--primary-light);
+      font-size: 13px;
+      font-weight: 600;
       flex-shrink: 0;
+      white-space: nowrap;
     }
 
     .levels-info-how {
@@ -1608,16 +1610,16 @@
     // GAMIFICACIÓN: XP + NIVELES
     // ===================================================================
     const LEVELS = [
-      { name: 'Principiante', xp: 0, emoji: '📖' },
-      { name: 'Aprendiz', xp: 100, emoji: '📝' },
-      { name: 'Estudiante', xp: 300, emoji: '🎒' },
-      { name: 'Conocedor', xp: 600, emoji: '🧠' },
-      { name: 'Erudito', xp: 1000, emoji: '📚' },
-      { name: 'Sabio', xp: 1600, emoji: '🦉' },
-      { name: 'Maestro', xp: 2500, emoji: '🎓' },
-      { name: 'Catedrático', xp: 4000, emoji: '👨‍🏫' },
-      { name: 'Académico', xp: 6000, emoji: '🏛️' },
-      { name: 'Leyenda', xp: 10000, emoji: '👑' },
+      { name: 'Principiante', xp: 0, emoji: '📖' },       // +100
+      { name: 'Aprendiz', xp: 100, emoji: '📝' },          // +150
+      { name: 'Estudiante', xp: 250, emoji: '🎒' },        // +200
+      { name: 'Conocedor', xp: 450, emoji: '🧠' },         // +250
+      { name: 'Erudito', xp: 700, emoji: '📚' },           // +300
+      { name: 'Sabio', xp: 1000, emoji: '🦉' },            // +350
+      { name: 'Maestro', xp: 1350, emoji: '🎓' },          // +400
+      { name: 'Catedrático', xp: 1750, emoji: '👨‍🏫' },     // +450
+      { name: 'Académico', xp: 2200, emoji: '🏛️' },        // +500
+      { name: 'Leyenda', xp: 2700, emoji: '👑' },
     ];
 
     function loadXP() {
@@ -1812,7 +1814,7 @@
                   <div class="levels-info-level-name">${lvl.name}</div>
                   <div class="levels-info-level-xp">${rangeText}</div>
                 </div>
-                ${isCurrent ? '<div class="levels-info-check">◀</div>' : ''}
+                ${isCurrent ? `<div class="levels-info-current-xp">${state.xp} XP ◀</div>` : ''}
               </div>`;
             }).join('')}
           </div>
