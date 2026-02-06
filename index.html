@@ -170,6 +170,12 @@
       gap: 8px;
     }
 
+    .start-buttons {
+      display: flex;
+      gap: 12px;
+      width: 100%;
+    }
+
     .btn-primary {
       background: var(--primary);
       color: white;
@@ -179,6 +185,27 @@
     }
     .btn-primary:hover { background: var(--primary-hover); }
     .btn-primary:active { transform: scale(0.98); }
+
+    .btn-fails {
+      background: var(--surface);
+      color: var(--danger);
+      border: 1px solid var(--danger);
+      width: 100%;
+      font-size: 16px;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .btn-fails:hover { background: rgba(239, 68, 68, 0.1); }
+    .btn-fails:active { transform: scale(0.98); }
+    .btn-fails .fail-count {
+      font-size: 12px;
+      opacity: 0.7;
+      font-weight: 400;
+    }
+    .btn-fails:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
 
     .btn-success {
       background: var(--success);
@@ -323,6 +350,7 @@
       align-items: center;
       justify-content: center;
       width: 100%;
+      place-self: center;
     }
 
     .card-front {
@@ -355,8 +383,10 @@
       font-weight: 700;
       text-align: center;
       line-height: 1.15;
-      max-width: 100%;
-      padding: 0 4px;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
 
     /* Palabras sueltas: nunca partir */
@@ -364,10 +394,12 @@
       white-space: nowrap;
     }
 
-    /* Frases (varias palabras): permitir salto entre palabras */
+    /* Frases (varias palabras): permitir salto entre palabras, centrado */
     .card-word.multi-word {
       word-break: normal;
       overflow-wrap: normal;
+      display: block;
+      text-align: center;
     }
 
     .card-word.size-xl { font-size: min(38px, 9vw); }
@@ -1142,7 +1174,8 @@
           box: Math.min(current.box === 0 ? 1 : current.box + 1, 5),
           correct: (current.correct || 0) + 1,
           incorrect: current.incorrect || 0,
-          lastSeen: Date.now()
+          lastSeen: Date.now(),
+          lastResult: 'correct'
         }
       };
     }
@@ -1155,9 +1188,19 @@
           box: 1,
           correct: current.correct || 0,
           incorrect: (current.incorrect || 0) + 1,
-          lastSeen: Date.now()
+          lastSeen: Date.now(),
+          lastResult: 'incorrect'
         }
       };
+    }
+
+    // Obtener palabras falladas la última vez
+    function getFailedWords(progress, selectedCategories) {
+      return SYNONYMS.filter(w =>
+        selectedCategories.includes(w.category) &&
+        progress[w.id] &&
+        progress[w.id].lastResult === 'incorrect'
+      );
     }
 
     function getGlobalStats(progress) {
@@ -1188,7 +1231,9 @@
       isFlipped: false,
       cardAnimating: false,
       sessionStats: { total: 0, correct: 0, incorrect: 0, streak: 0, bestStreak: 0, wrongCards: [] },
-      showResetConfirm: false
+      showResetConfirm: false,
+      failsOnly: false, // modo solo fallos
+      failsPool: []     // palabras disponibles en modo fallos
     };
 
     function setState(updates) {
@@ -1229,8 +1274,14 @@
       setState({ settings: newSettings });
     }
 
-    function startGame() {
-      const card = selectNextCard(SYNONYMS, state.progress, state.settings.categories, null);
+    function startGame(onlyFails) {
+      const failsOnly = !!onlyFails;
+      let pool = SYNONYMS;
+      if (failsOnly) {
+        pool = getFailedWords(state.progress, state.settings.categories);
+        if (pool.length === 0) return;
+      }
+      const card = selectNextCard(pool, state.progress, state.settings.categories, null);
       if (!card) return;
       setState({
         screen: 'playing',
@@ -1238,6 +1289,8 @@
         lastCardId: null,
         isFlipped: false,
         cardAnimating: true,
+        failsOnly,
+        failsPool: failsOnly ? pool : [],
         sessionStats: { total: 0, correct: 0, incorrect: 0, streak: 0, bestStreak: 0, wrongCards: [] }
       });
       setTimeout(() => setState({ cardAnimating: false }), 350);
@@ -1278,7 +1331,13 @@
     }
 
     function nextCard(newProgress, stats) {
-      const card = selectNextCard(SYNONYMS, newProgress, state.settings.categories, state.currentCard.id);
+      const pool = state.failsOnly ? state.failsPool : SYNONYMS;
+      const card = selectNextCard(pool, newProgress, state.settings.categories, state.currentCard.id);
+      if (!card) {
+        // Se acabaron las palabras (posible en modo fallos)
+        setState({ progress: newProgress, sessionStats: stats, screen: 'summary' });
+        return;
+      }
       setState({
         progress: newProgress,
         sessionStats: stats,
@@ -1354,7 +1413,7 @@
             <div class="category-chips" id="chips"></div>
           </div>
 
-          <button class="btn btn-primary" id="btn-start">Empezar</button>
+          <div class="start-buttons" id="start-buttons"></div>
 
           ${stats.studied > 0 ? `
             <button class="btn btn-ghost" id="btn-reset">Reiniciar progreso</button>
@@ -1384,7 +1443,24 @@
         chipsContainer.appendChild(chip);
       });
 
-      document.getElementById('btn-start').addEventListener('click', startGame);
+      // Botones de inicio
+      const startBtns = document.getElementById('start-buttons');
+      const failedWords = getFailedWords(state.progress, state.settings.categories);
+      const hasProgress = stats.studied > 0;
+
+      if (hasProgress) {
+        startBtns.innerHTML = `
+          <button class="btn btn-primary" id="btn-start">Completo</button>
+          <button class="btn btn-fails" id="btn-fails" ${failedWords.length === 0 ? 'disabled' : ''}>
+            Fallos
+            <span class="fail-count">${failedWords.length} palabras</span>
+          </button>
+        `;
+        document.getElementById('btn-fails').addEventListener('click', () => startGame(true));
+      } else {
+        startBtns.innerHTML = `<button class="btn btn-primary" id="btn-start">Empezar</button>`;
+      }
+      document.getElementById('btn-start').addEventListener('click', () => startGame(false));
 
       const resetBtn = document.getElementById('btn-reset');
       if (resetBtn) {
@@ -1415,6 +1491,7 @@
         <div class="game-screen">
           <div class="game-header">
             <div class="progress-info">
+              ${state.failsOnly ? `<div class="progress-stat" style="color: var(--danger); font-weight: 600;">Solo fallos</div>` : ''}
               <div class="progress-stat"><span>${total}</span> tarjetas</div>
               ${streak > 2 ? `<div class="progress-stat" style="color: var(--success);">🔥 ${streak}</div>` : ''}
             </div>
