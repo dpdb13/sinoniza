@@ -15,7 +15,7 @@
 - Anti-cache con meta tags (no hay Service Worker)
 
 ## Funcionalidades implementadas
-- **460 pares de sinónimos** en 6 categorías: Verbo (95), Adjetivo (85), Sustantivo (80), Arcaísmo (90), Cultismo (55), Educación (55)
+- **600 pares de sinónimos** en 6 categorías: Verbo (115), Adjetivo (105), Sustantivo (105), Arcaísmo (100), Cultismo (80), Educación (95)
 - **Flashcard con flip 3D**: ver palabra → pensar → girar → ver sinónimo → acierto/error
 - **Repetición espaciada (Leitner 5 cajas)**: lo que aciertas sale menos, lo que fallas sale más
 - **Filtro por categorías**: toca una para jugar solo esa, toca otra vez para todas
